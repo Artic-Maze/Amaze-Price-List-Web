@@ -1,0 +1,60 @@
+<div class="--custom-card">
+  <div class="--image-wrapper">
+    {% comment %} Markup for Image {% endcomment %}
+    {% assign desktopImage = block.settings.image %}
+    {% assign mobileImage = block.settings.image_mobile %}
+    {% if mobileImage == blank %}
+      {% assign mobileImage = block.settings.image %}
+    {% endif %}
+    {% if block.settings.loading_priority == 'high' %}
+      {% assign loading_priority = 'loading="eager" fetchpriority="high"' %}
+    {% else %}
+      {% assign loading_priority = 'loading="lazy" ' %}
+    {% endif %}
+
+    {% if mobileImage != blank %}
+      <picture>
+        <source
+          media="(max-width:350)"
+          srcset="{{ mobileImage | image_url: width: 400 }}"
+          {{ loading_priority }}
+        >
+        <source
+          media="(max-width:400px)"
+          srcset="{{ mobileImage | image_url: width: 500 }}"
+          {{ loading_priority }}
+        >
+        <source
+          media="(max-width:600px)"
+          srcset="{{ mobileImage | image_url: width: 650 }}"
+          {{ loading_priority }}
+        >
+        <source
+          media="(max-width:1200px)"
+          srcset="{{ desktopImage | image_url: width: 1200 }}"
+          {{ loading_priority }}
+        >
+        <source
+          media="(max-width:1600px)"
+          srcset="{{ desktopImage | image_url: width: 1600 }}"
+          {{ loading_priority }}
+        >
+        <source
+          media="(max-width:2000px)"
+          srcset="{{ desktopImage | image_url: width: 2000 }}"
+          {{ loading_priority }}
+        >
+        <img src="{{ desktopImage | image_url: width: desktopImage.width }}" {{ loading_priority }}>
+      </picture>
+    {% else %}
+      {{ 'image' | placeholder_svg_tag: '--banner--placeholder' }}
+    {% endif %}
+  </div>
+
+  {% if block.settings.title != blank %}
+    <h3>{{ block.settings.title }}</h3>
+  {% endif %}
+  {% if block.settings.subtitle != blank %}
+    <div>{{ block.settings.subtitle }}</div>
+  {% endif %}
+</div>

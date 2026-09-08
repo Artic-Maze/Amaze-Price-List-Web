@@ -1,0 +1,214 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "xbanner_kgcdqK": {
+      "type": "xbanner",
+      "blocks": {
+        "slide_zcWgtD": {
+          "type": "slide",
+          "settings": {
+            "media_type": "image",
+            "loading_priority": "lazy",
+            "banner_overlay": 5,
+            "banner_caption": "Caption",
+            "title": "Banner Title",
+            "heading_type": "h1",
+            "content": "<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>",
+            "primary_button_text": "Primary Button",
+            "primary_button_url": "",
+            "secondary_button_text": "",
+            "secondary_button_url": "",
+            "horizontal_alignment": "justify-left",
+            "vertical_alignment": "align-middle",
+            "custom_styling": ""
+          }
+        },
+        "slide_dFEXGj": {
+          "type": "slide",
+          "settings": {
+            "media_type": "image",
+            "loading_priority": "lazy",
+            "banner_overlay": 5,
+            "banner_caption": "Caption",
+            "title": "Banner Title",
+            "heading_type": "h1",
+            "content": "<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>",
+            "primary_button_text": "Primary Button",
+            "primary_button_url": "",
+            "secondary_button_text": "",
+            "secondary_button_url": "",
+            "horizontal_alignment": "justify-left",
+            "vertical_alignment": "align-middle",
+            "custom_styling": ""
+          }
+        }
+      },
+      "block_order": [
+        "slide_zcWgtD",
+        "slide_dFEXGj"
+      ],
+      "name": "xBanner",
+      "settings": {
+        "full_width": true,
+        "navid": "",
+        "bg-color": "",
+        "margin_top": 0,
+        "margin_bottom": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "margin_top_mobile": 0,
+        "margin_bottom_mobile": 0,
+        "padding_top_mobile": 0,
+        "padding_bottom_mobile": 0
+      }
+    },
+    "xcollection_tab_EnGXCQ": {
+      "type": "xfeatured-collection-tab",
+      "blocks": {
+        "tab_LcfBpB": {
+          "type": "tab",
+          "settings": {
+            "tab_title": "All",
+            "collection": "all"
+          }
+        }
+      },
+      "block_order": [
+        "tab_LcfBpB"
+      ],
+      "name": "xCollection Tab",
+      "settings": {
+        "full_width": false,
+        "navid": "",
+        "caption": "Caption",
+        "title": "Title",
+        "subtitle": "Subtitle",
+        "display-type": "slider",
+        "bg-color": "",
+        "button_label": "Show All",
+        "margin_top": 0,
+        "margin_bottom": 0,
+        "padding_top": 50,
+        "padding_bottom": 50,
+        "margin_top_mobile": 0,
+        "margin_bottom_mobile": 0,
+        "padding_top_mobile": 20,
+        "padding_bottom_mobile": 20
+      }
+    },
+    "ximage_with_text_eRKAQD": {
+      "type": "ximage-with-text",
+      "name": "xImage With Text",
+      "settings": {
+        "full_width": false,
+        "navid": "",
+        "section_layout": "image_first",
+        "image": "shopify://shop_images/house-plant-in-white-pot_925x_3c60d28e-8890-464b-a9d3-d1b3304a0b71.jpg",
+        "caption": "Caption",
+        "title": "Title",
+        "subtitle": "Subtitle",
+        "content": "<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text since 1966.</p>",
+        "button_label": "Button",
+        "button_url": "",
+        "bg-color": "",
+        "margin_top": 0,
+        "margin_bottom": 0,
+        "padding_top": 50,
+        "padding_bottom": 50,
+        "margin_top_mobile": 0,
+        "margin_bottom_mobile": 0,
+        "padding_top_mobile": 20,
+        "padding_bottom_mobile": 20
+      }
+    },
+    "xcustom_elements_7zefRz": {
+      "type": "xcustom-elements",
+      "blocks": {
+        "caption_A3mj8q": {
+          "type": "caption",
+          "settings": {
+            "title": "Caption",
+            "style": "style_1"
+          }
+        },
+        "title_qXDBGg": {
+          "type": "title",
+          "settings": {
+            "title": "Section Title"
+          }
+        },
+        "content_6qLFBf": {
+          "type": "content",
+          "settings": {
+            "title": "<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>"
+          }
+        },
+        "button_4MLWJq": {
+          "type": "button",
+          "settings": {
+            "open_in_new_tab": false,
+            "primary_button_title": "Primary Button",
+            "primary_button_url": "",
+            "primary_button_style": "primary-button",
+            "secondary_button_title": "Secondary Button",
+            "secondary_button_url": "",
+            "secondary_button_style": "secondary-button"
+          }
+        },
+        "image_kBpymF": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/picket-fence-flowers_925x_2e1d609e-108c-49d4-986b-70a4020e3a8f.jpg"
+          }
+        },
+        "video_f98344": {
+          "type": "video",
+          "settings": {
+            "video": "shopify://files/videos/7653746-uhd_4096_2160_25fps.mp4",
+            "video_mobile": "shopify://files/videos/7031214_French_Alps_3840x2160.mov"
+          }
+        }
+      },
+      "block_order": [
+        "caption_A3mj8q",
+        "title_qXDBGg",
+        "content_6qLFBf",
+        "button_4MLWJq",
+        "image_kBpymF",
+        "video_f98344"
+      ],
+      "name": "xCustom Element",
+      "settings": {
+        "full_width": false,
+        "navid": "",
+        "content-color": "",
+        "bg-color": "#fffcf0",
+        "margin_top": 0,
+        "margin_bottom": 0,
+        "padding_top": 50,
+        "padding_bottom": 50,
+        "margin_top_mobile": 0,
+        "margin_bottom_mobile": 0,
+        "padding_top_mobile": 20,
+        "padding_bottom_mobile": 20,
+        "custom_liquid": ""
+      }
+    },
+   
+  },
+  "order": [
+    "xbanner_kgcdqK",
+    "xcollection_tab_EnGXCQ",
+    "ximage_with_text_eRKAQD",
+    "xcustom_elements_7zefRz",
+   
+  ]
+}

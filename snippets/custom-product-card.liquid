@@ -1,0 +1,39 @@
+<style>
+  .--product-card {
+    .--product-image-wrapper {
+        aspect-ratio: 1;
+        line-height: 0;
+    }
+    .--product-image-wrapper  img {
+            
+            aspect-ratio: 1;
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+    }
+  }
+</style>
+{% assign card_product = product %}
+<div class="--product-card">
+  <div class="--product-image-wrapper">
+    {% assign current_variant = product.selected_or_first_available_variant %}
+
+    {% if current_variant.image %}
+      {{ current_variant.image | image_url: width: 800 | image_tag: alt: current_variant.title }}
+    {% else %}
+      {%- comment -%} Fallback to product's featured media/image {%- endcomment -%}
+      {% if product.featured_media %}
+        {{ product.featured_media | image_url: width: 800 | image_tag: alt: product.title }}
+      {% elsif product.featured_image %}
+        {{ product.featured_image | image_url: width: 800 | image_tag: alt: product.title }}
+      {% endif %}
+    {% endif %}
+  </div>
+  <div>
+    <h3>{{ product.title }}</h3>
+    <div>
+      {{ product.selected_or_first_available_variant.title }}
+      {{ product.selected_or_first_available_variant.next_incoming_date }}
+    </div>
+  </div>
+</div>

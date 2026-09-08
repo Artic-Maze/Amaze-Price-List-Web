@@ -1,0 +1,26 @@
+<style>
+    /* Top Block Styling */
+    .section-container--{{ section.id }} {
+    .--top-block {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    
+    
+    
+    }
+</style>
+
+<div class="--top-block">
+  {% if section.settings.caption != blank %}
+    <div class="--section-caption">{{ section.settings.caption }}</div>
+  {% endif %}
+  {% if section.settings.title != blank %}
+    <h2 class="--section-title">{{ section.settings.title }}</h2>
+  {% endif %}
+  {% if section.settings.subtitle != blank %}
+    <div class="--section-subtitle">{{ section.settings.subtitle }}</div>
+  {% endif %}
+</div>

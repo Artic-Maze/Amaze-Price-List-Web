@@ -1,0 +1,325 @@
+<style>
+        .section-container--{{ section.id }}{
+          margin-top: {{ section.settings.margin_top | append:'px' }};
+          margin-bottom: {{ section.settings.margin_bottom | append:'px' }};
+          padding-top: {{ section.settings.padding_top | append:'px' }};
+          padding-bottom: {{ section.settings.padding_bottom | append:'px' }};
+           background: {{ section.settings.bg-color }};
+          overflow: hidden;
+        }
+
+
+        @media screen and (max-width: 768px){
+          .section-container--{{ section.id }}{
+            margin-top: {{ section.settings.margin_top_mobile | append:'px' }};
+            margin-bottom: {{ section.settings.margin_bottom_mobile | append:'px'  }};
+            padding-top: {{ section.settings.padding_top_mobile | append:'px' }};
+            padding-bottom: {{ section.settings.padding_bottom_mobile | append:'px' }};
+          }
+
+        }
+
+
+         .section-wrapper--{{ section.id }} {
+              display: flex;
+              flex-direction: column;
+              gap: 20px;
+          }
+
+      .test-grid-1 {
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr;
+      }
+      .--active-filters {
+      grid-column: span 3;
+      background: #a1ff004f;
+  }
+      ul.--all-filters {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    ul.--all-filters h4 {
+      margin: 0 0 5px 0;
+    }
+      ul.--filter-values {
+        padding-left: 15px;
+    }
+</style>
+<section class="section-container--{{ section.id }}" id="{{ section.settings.navid }}">
+  <div
+    class="section-wrapper--{{ section.id }}{% if section.settings.full_width != true %} page-width {% endif %}"
+  >
+    {% render 'top-block', section: section %}
+
+    {% if section.settings.content != blank %}
+      <div class="--content-wrapper">{{ section.settings.content }}</div>
+    {% endif %}
+
+    <h2>{{ collection.title }}</h2>
+
+    <div class="test-grid-1">
+      {% assign total_active = 0 %}
+      {% for filter in collection.filters %}
+        {% assign total_active = total_active | plus: filter.active_values.size %}
+      {% endfor %}
+
+      {% if total_active > 0 %}
+        <div class="--active-filters">
+          {% for filter in collection.filters %}
+            {% for value in filter.active_values %}
+              <div class="active-filter" data-url="{{ value.url_to_remove }}">
+                {{ filter.label }}: {{ value.label }}
+              </div>
+            {% endfor %}
+          {% endfor %}
+          <div class="active-filter" data-url="{{ collection.url }}">Remove All {{ total_active }}</div>
+        </div>
+      {% endif %}
+      <div class="--sort-options">
+        <div>{{ collection.sort_by | json }}</div>
+        <div>{{ collection.sort_options | json }}</div>
+      </div>
+      <ul class="--all-filters">
+        {% for filter in collection.filters %}
+          <li>
+            <h4>
+              {{ forloop.index }}
+              {{ filter.label }}
+            </h4>
+
+            <ul class="--filter-values">
+              {% for filter_value in filter.values %}
+                <li>
+                  <a href="{{ filter_value.url_to_add }}" data-url="{{ filter_value.url_to_add }}">
+                    {{ filter_value.label }} ({{ filter_value.count }})</a
+                  >
+                </li>
+              {% endfor %}
+            </ul>
+          </li>
+        {% endfor %}
+      </ul>
+      <ul class="--product-list">
+        {% for product in collection.products %}
+          <li>
+            {{ forloop.index }}
+            {{ product.title }}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<script>
+  window.handleCollection = function () {
+    const section_id = '{{ section.id }}';
+
+    if (typeof section_id !== 'string' || !section_id) {
+      console.error('Invalid section_id:', section_id);
+      return;
+    }
+
+    document.addEventListener('click', async (e) => {
+      const item = e.target.closest('[data-url]');
+
+      if (!item) return;
+
+      e.preventDefault();
+
+      const dataUrl = item.dataset.url;
+      const url = new URL(dataUrl, window.location.origin);
+
+      // Add section_id only for AJAX request
+      url.searchParams.set('section_id', section_id);
+
+      try {
+        const res = await fetch(url.toString());
+        if (!res.ok) {
+          throw new Error(`HTTP error: ${res.status}`);
+        }
+        const html = await res.text();
+        const newDocument = new DOMParser().parseFromString(html, 'text/html');
+        const newGrid = newDocument.querySelector('.test-grid-1');
+        const currentGrid = document.querySelector('.test-grid-1');
+        if (!newGrid || !currentGrid) {
+          console.error('.test-grid-1 not found');
+          return;
+        }
+
+        currentGrid.replaceWith(newGrid);
+
+        // Remove section_id from visible page URL
+
+        if (url.searchParams.has('section_id')) {
+          url.searchParams.delete('section_id');
+        }
+
+        window.history.pushState({}, '', url.pathname + url.search);
+      } catch (error) {
+        console.error('Collection fetch error:', error);
+      }
+    });
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    window.handleCollection();
+  });
+</script>
+
+{% schema %}
+{
+  "name": "xCollection Grid",
+
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full Width Section",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "navid",
+      "label": "Id(for navigation)"
+    },
+    {
+      "type": "text",
+      "id": "caption",
+      "label": "Caption",
+      "default": "Caption"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Title"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Subtitle"
+    },
+    {
+      "type": "richtext",
+      "id": "content",
+      "label": "Content",
+      "default": "<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text since 1966.</p>"
+    },
+    {
+      "type": "color",
+      "id": "bg-color",
+      "label": "Background Color"
+    },
+    {
+      "type": "header",
+      "content": "Desktop Spacing"
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Bottom",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 50
+    },
+    {
+      "type": "header",
+      "content": "Mobile Spacing"
+    },
+    {
+      "type": "range",
+      "id": "margin_top_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Top (Mobile)",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Bottom (Mobile)",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Top  (Mobile)",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Bottom  (Mobile)",
+      "default": 20
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Support",
+      "type": "support",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "xCollection Grid",
+      "category": "Custom Sections"
+    }
+  ]
+}
+{% endschema %}

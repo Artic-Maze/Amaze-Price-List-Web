@@ -1,0 +1,292 @@
+<style>
+  .section-container--{{ section.id }}{
+    margin-top: {{ section.settings.margin_top | append:'px' }};
+    margin-bottom: {{ section.settings.margin_bottom | append:'px' }};
+    padding-top: {{ section.settings.padding_top | append:'px' }};
+    padding-bottom: {{ section.settings.padding_bottom | append:'px' }};
+     background: {{ section.settings.bg-color }};
+    overflow: hidden;
+  }
+
+
+  @media screen and (max-width: 768px){
+    .section-container--{{ section.id }}{
+      margin-top: {{ section.settings.margin_top_mobile | append:'px' }};
+      margin-bottom: {{ section.settings.margin_bottom_mobile | append:'px'  }};
+      padding-top: {{ section.settings.padding_top_mobile | append:'px' }};
+      padding-bottom: {{ section.settings.padding_bottom_mobile | append:'px' }};
+    }
+
+  }
+
+.section-container--{{ section.id }}{
+.section-wrapper--{{ section.id }} {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 20px;
+    align-items: center;
+    @media(max-width: 768px){
+     grid-template-columns: repeat(1, minmax(0,1fr));
+    }
+}
+
+{% comment %} Text first layout for desktop  {% endcomment %}
+ @media(min-width: 769px){
+        .section-wrapper--{{ section.id }}.text_first .--text-block-wrapper {
+            grid-column: 1/2;
+            grid-row: 1/2;
+        }
+}
+ 
+
+}
+
+
+
+
+</style>
+<section class="section-container--{{ section.id }}" id="{{ section.settings.navid }}">
+  <div
+    class="section-wrapper--{{ section.id }}{% if section.settings.full_width != true %} page-width {% endif %} {{ section.settings.section_layout }}"
+  >
+    <div class="--image-wrapper">
+       
+      {% comment %} Markup for Image {% endcomment %}
+      {% assign desktopImage = section.settings.image %}
+      {% assign mobileImage = section.settings.image_mobile %}
+      {% if mobileImage == blank %}
+        {% assign mobileImage = section.settings.image %}
+      {% endif %}
+      
+      {% if block.settings.loading_priority == 'high' %}
+        {% assign loading_priority = 'loading="eager" fetchpriority="high"' %}
+      {% else %}
+        {% assign loading_priority = 'loading="lazy" ' %}
+      {% endif %}
+
+      {% if mobileImage != blank %}
+        <picture>
+          <source
+            media="(max-width:350)"
+            srcset="{{ mobileImage | image_url: width: 400 }}"
+            {{ loading_priority }}
+          >
+          <source
+            media="(max-width:400px)"
+            srcset="{{ mobileImage | image_url: width: 500 }}"
+            {{ loading_priority }}
+          >
+          <source
+            media="(max-width:600px)"
+            srcset="{{ mobileImage | image_url: width: 650 }}"
+            {{ loading_priority }}
+          >
+          <source
+            media="(max-width:1200px)"
+            srcset="{{ desktopImage | image_url: width: 1200 }}"
+            {{ loading_priority }}
+          >
+          <source
+            media="(max-width:1600px)"
+            srcset="{{ desktopImage | image_url: width: 1600 }}"
+            {{ loading_priority }}
+          >
+          <source
+            media="(max-width:2000px)"
+            srcset="{{ desktopImage | image_url: width: 2000 }}"
+            {{ loading_priority }}
+          >
+          <img src="{{ desktopImage | image_url: width: desktopImage.width }}" {{ loading_priority }}>
+        </picture>
+      {% else %}
+        {{ 'image' | placeholder_svg_tag: '--banner--placeholder' }}
+      {% endif %}
+    </div>
+    <div class="--text-block-wrapper">
+      {% render 'top-block', section: section %}
+
+      {% if section.settings.content != blank %}
+        <div class="--content-wrapper">{{ section.settings.content }}</div>
+      {% endif %}
+      {% if section.settings.button_label != blank %}
+        <a class="button" href="{{ section.settings.button_url }}">{{ section.settings.button_label }}</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Image With Text",
+
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full Width Section",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "navid",
+      "label": "Id(for navigation)"
+    },
+    {
+      "type": "select",
+      "id": "section_layout",
+      "label": "Section Layout",
+      "default": "image_first",
+      "options": [
+        {
+          "label": "Image First",
+          "value": "image_first"
+        },
+        {
+          "label": "Text First",
+          "value": "text_first"
+        }
+      ]
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "caption",
+      "label": "Caption",
+      "default": "Caption"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Title"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Subtitle"
+    },
+    {
+      "type": "richtext",
+      "id": "content",
+      "label": "Content",
+      "default": "<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text since 1966.</p>"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button Label",
+      "default": "Button"
+    },
+    {
+      "type": "text",
+      "id": "button_url",
+      "label": "Button Url"
+    },
+    {
+      "type": "color",
+      "id": "bg-color",
+      "label": "Background Color"
+    },
+    {
+      "type": "header",
+      "content": "Desktop Spacing"
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Bottom",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 50
+    },
+    {
+      "type": "header",
+      "content": "Mobile Spacing"
+    },
+    {
+      "type": "range",
+      "id": "margin_top_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Top (Mobile)",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Bottom (Mobile)",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Top  (Mobile)",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Bottom  (Mobile)",
+      "default": 20
+    }
+  ],
+
+  "presets": [
+    {
+      "name": "xImage With Text",
+      "category": "Custom Sections"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,586 @@
+{% assign slides = section.blocks | where: 'type', 'slide' %}
+<style>
+      .section-container--{{ section.id }}{
+        margin-top: {{ section.settings.margin_top | append:'px' }};
+        margin-bottom: {{ section.settings.margin_bottom | append:'px' }};
+        padding-top: {{ section.settings.padding_top | append:'px' }};
+        padding-bottom: {{ section.settings.padding_bottom | append:'px' }};
+         background: {{ section.settings.bg-color }};
+        overflow: hidden;
+      }
+
+
+      @media screen and (max-width: 768px){
+        .section-container--{{ section.id }}{
+          margin-top: {{ section.settings.margin_top_mobile | append:'px' }};
+          margin-bottom: {{ section.settings.margin_bottom_mobile | append:'px'  }};
+          padding-top: {{ section.settings.padding_top_mobile | append:'px' }};
+          padding-bottom: {{ section.settings.padding_bottom_mobile | append:'px' }};
+        }
+
+      }
+
+    .section-container--{{ section.id }}{
+
+    .--banner-content-wrapper {
+        height: 70vh;
+        padding-block: 50px;
+        display: flex;
+        box-sizing: border-box;
+        @media(max-width: 768px){
+         height: 70dvh;
+        }
+
+    }
+    .--image-wrapper.--bg-wrapper {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+    .--image-wrapper.--bg-wrapper::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+    }
+    .--image-wrapper.--bg-wrapper :is(svg, img, video){
+
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .--image-wrapper.--bg-wrapper :is(svg.--banner--placeholder, img, video){
+
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .--image-wrapper.--bg-wrapper svg.--banner--placeholder{
+        object-fit: contain;
+    }
+
+    .--text-content-block {
+        max-width: 400px;
+        background: #fff;
+        position: relative;
+        z-index: 1;
+    }
+    .--button_container {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 30px;
+    }
+
+
+ .--nav-icon {
+   
+    transform: translateY(-50%);
+}
+
+  .swiper-pagination--{{ section.id }}.swiper-pagination-bullets {
+      max-width: max-content;
+      background: rgba(235, 235, 235, 1);
+      left: 50%;
+      line-height: 0;
+      padding: 5px 10px;
+      border-radius: 5px;
+      display: flex;
+      gap: 5px;
+      transform: translateX(-50%);
+  }
+  .swiper-pagination--{{ section.id }}  span.swiper-pagination-bullet {
+      margin: 0;
+      opacity: 1;
+      background: red;
+      transition: 0.3s ease;
+  }
+  .swiper-pagination--{{ section.id }}  span.swiper-pagination-bullet.swiper-pagination-bullet-active {
+      background: blue;
+      width: 20px;
+      border-radius: 4px;
+  }
+
+
+    }
+    {% comment %} Alignment Styling {% endcomment %}
+            .section-container--{{section.id }}  .justify-left { justify-content: flex-start; }
+            .section-container--{{section.id }}  .justify-center { justify-content: center; text-align: center; }
+            .section-container--{{section.id }}  .justify-right { justify-content: flex-end; }
+            .section-container--{{section.id }}  .align-top { align-items: flex-start; }
+            .section-container--{{section.id }}  .align-middle { align-items: center; }
+            .section-container--{{section.id }}  .align-bottom { align-items: flex-end; }
+</style>
+<section class="section-container--{{ section.id }}" id="{{ section.settings.navid }}">
+  <div
+    class="section-wrapper--{{ section.id }}{% if section.settings.full_width != true %} page-width {% endif %}"
+  >
+    <div class="swiper swiper--{{ section.id }}">
+      <div class="swiper-wrapper">
+        {% for block in section.blocks %}
+          <div class="swiper-slide --banner-{{ section.id }}-{{ block.id }}">
+            <style>
+              .--banner-{{ section.id }}-{{ block.id }}{
+                  .--image-wrapper.--bg-wrapper::after {
+                      background: rgba(0,0,0,{{ block.settings.banner_overlay | append: "%" }});
+                  }
+                  {{ block.settings.custom_styling }}
+              }
+            </style>
+
+            <div class="--image-wrapper --bg-wrapper">
+              {% if block.settings.media_type != 'video' %}
+                {% comment %} Markup for Image {% endcomment %}
+                {% assign desktopImage = block.settings.image %}
+                {% assign mobileImage = block.settings.image_mobile %}
+                {% if mobileImage == blank %}
+                  {% assign mobileImage = block.settings.image %}
+                {% endif %}
+                {% if block.settings.loading_priority == 'high' %}
+                  {% assign loading_priority = 'loading="eager" fetchpriority="high"' %}
+                {% else %}
+                  {% assign loading_priority = 'loading="lazy" ' %}
+                {% endif %}
+
+                {% if mobileImage != blank %}
+                  <picture>
+                    <source
+                      media="(max-width:350)"
+                      srcset="{{ mobileImage | image_url: width: 400 }}"
+                      {{ loading_priority }}
+                    >
+                    <source
+                      media="(max-width:400px)"
+                      srcset="{{ mobileImage | image_url: width: 500 }}"
+                      {{ loading_priority }}
+                    >
+                    <source
+                      media="(max-width:600px)"
+                      srcset="{{ mobileImage | image_url: width: 650 }}"
+                      {{ loading_priority }}
+                    >
+                    <source
+                      media="(max-width:1200px)"
+                      srcset="{{ desktopImage | image_url: width: 1200 }}"
+                      {{ loading_priority }}
+                    >
+                    <source
+                      media="(max-width:1600px)"
+                      srcset="{{ desktopImage | image_url: width: 1600 }}"
+                      {{ loading_priority }}
+                    >
+                    <source
+                      media="(max-width:2000px)"
+                      srcset="{{ desktopImage | image_url: width: 2000 }}"
+                      {{ loading_priority }}
+                    >
+                    <img src="{{ desktopImage | image_url: width: desktopImage.width }}" {{ loading_priority }}>
+                  </picture>
+                {% else %}
+                  {{ 'image' | placeholder_svg_tag: '--banner--placeholder' }}
+                {% endif %}
+              {% elsif block.settings.media_type == 'video' %}
+                {% comment %} {{ block.settings.video | video_tag: autoplay: true, loop: true, muted: true, controls: false }} {% endcomment %}
+                {% if block.settings.loading_priority == 'high' %}
+                  {% assign loading_priority = ' preload="metadata" fetchpriority="high"' %}
+                {% else %}
+                  {% assign loading_priority = ' preload="auto" ' %}
+                {% endif %}
+                {% if block.settings.video != blank %}
+                  {% assign desktop_video = block.settings.video %}
+                  {% assign mobile_video = block.settings.video_mobile %}
+                  {% assign desktop_source = null %}
+                  {% assign mobile_source = null %}
+
+                  {% if desktop_video and desktop_video.sources and desktop_video.sources.size > 0 %}
+                    {% assign desktop_max_height = 0 %}
+                    {% for source in desktop_video.sources %}
+                      {% if source.format == 'mp4' and source.height and source.height > desktop_max_height %}
+                        {% assign desktop_source = source %}
+                        {% assign desktop_max_height = source.height %}
+                      {% endif %}
+                    {% endfor %}
+                  {% endif %}
+
+                  {% if mobile_video and mobile_video.sources and mobile_video.sources.size > 0 %}
+                    {% assign mobile_max_height = 0 %}
+
+                    {% for source in mobile_video.sources %}
+                      {% if source.format == 'mp4' and source.height and source.height > mobile_max_height %}
+                        {% assign mobile_source = source %}
+                        {% assign mobile_max_height = source.height %}
+                      {% endif %}
+                    {% endfor %}
+                  {% endif %}
+
+                  <video
+                    playsinline="playsinline"
+                    autoplay="autoplay"
+                    loop="loop"
+                    muted="muted"
+                    {% comment %} preload="metadata" {% endcomment %}
+                    {{ loading_priority }}
+                    crossorigin="anonymous"
+                  >
+                    {% if mobile_source != null %}
+                      <source
+                        src="{{ mobile_source.url }}"
+                        type="{{ mobile_source.mime_type }}"
+                        media="(max-width: 767px)"
+                      >
+                    {% endif %}
+
+                    <source
+                      src="{{ desktop_source.url }}"
+                      type="{{ desktop_source.mime_type }}"
+                    >
+                  </video>
+                {% endif %}
+              {% endif %}
+            </div>
+
+            <div class="--banner-content-wrapper page-width {{ block.settings.vertical_alignment }} {{ block.settings.horizontal_alignment }}">
+              <div class="--text-content-block">
+                {% if block.settings.banner_caption != blank %}
+                  <span class="--caption">{{ block.settings.banner_caption }}</span>
+                {% endif %}
+
+                {% if block.settings.title != blank %}
+                  {% if block.settings.heading_type == 'h1' %}
+                    <h1 class="--section-title">{{ block.settings.title }}</h1>
+                  {% else %}
+                    <h2 class="--section-title">{{ block.settings.title }}</h2>
+                  {% endif %}
+                {% endif %}
+
+                {% if block.settings.content != blank %}
+                  <div class="--content">{{ block.settings.content }}</div>
+                {% endif %}
+
+                <div class="--button_container">
+                  {% if block.settings.primary_button_text != blank %}
+                    <a
+                      class="--primary-button button"
+                      href="{{ block.settings.primary_button_url }}"
+                    >
+                      {{ block.settings.primary_button_text }}
+                    </a>
+                  {% endif %}
+                  {% if block.settings.secondary_button_text != blank %}
+                    <a
+                      class="--secondary-button button"
+                      href="{{ block.settings.secondary_button_url }}"
+                    >
+                      {{ block.settings.secondary_button_text }}
+                    </a>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+      {% if slides.size > 1 %}
+        <div class="--nav-icon swiper-button-prev swiper-button-prev--{{ section.id }}">
+         {% render 'all-icons', name: 'chevron-left' %}
+        </div>
+        <div class="--nav-icon swiper-button-next swiper-button-next--{{ section.id }}">
+           {% render 'all-icons', name: 'chevron-right' %}
+        </div>
+        <div class="swiper-pagination swiper-pagination--{{ section.id }}"></div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    new Swiper('.swiper--{{ section.id }}', {
+      autoHeight: true,
+      spaceBetween: 20,
+      navigation: {
+        nextEl: '.swiper-button-next--{{ section.id }}',
+        prevEl: '.swiper-button-prev--{{ section.id }}',
+      },
+      pagination: {
+        el: '.swiper-pagination--{{ section.id }}',
+        clickable: true,
+      },
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "xBanner",
+
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full Width Section",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "navid",
+      "label": "Id(for navigation)"
+    },
+
+    {
+      "type": "color",
+      "id": "bg-color",
+      "label": "Background Color"
+    },
+    {
+      "type": "header",
+      "content": "Desktop Spacing"
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Bottom",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Mobile Spacing"
+    },
+    {
+      "type": "range",
+      "id": "margin_top_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Top (Mobile)",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Bottom (Mobile)",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Top  (Mobile)",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Bottom  (Mobile)",
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Slide",
+      "type": "slide",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Media"
+        },
+        {
+          "type": "select",
+          "id": "media_type",
+          "label": "Media Type",
+          "default": "image",
+          "options": [
+            { "value": "image", "label": "Image" },
+            { "value": "video", "label": "Video" }
+          ]
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Desktop Image"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_mobile",
+          "label": "Mobile Image"
+        },
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Desktop Video"
+        },
+        {
+          "type": "video",
+          "id": "video_mobile",
+          "label": "Mobile Video"
+        },
+
+        {
+          "type": "select",
+          "id": "loading_priority",
+          "label": "Loading Priority",
+          "default": "lazy",
+          "options": [
+            { "value": "lazy", "label": "Lazy" },
+            { "value": "high", "label": "High" }
+          ]
+        },
+
+        {
+          "type": "range",
+          "id": "banner_overlay",
+          "min": 0,
+          "max": 100,
+          "step": 5,
+          "unit": "%",
+          "default": 5,
+          "label": "Banner Overlay"
+        },
+        {
+          "type": "header",
+          "content": "Text Content"
+        },
+        {
+          "type": "text",
+          "id": "banner_caption",
+          "label": "Caption",
+          "default": "Caption"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "title",
+          "label": "Banner Title",
+          "default": "Banner Title"
+        },
+        {
+          "type": "select",
+          "id": "heading_type",
+          "label": "Heading Type",
+          "default": "h1",
+          "options": [
+            {
+              "label": "H1",
+              "value": "h1"
+            },
+            {
+              "label": "H2",
+              "value": "h2"
+            }
+          ]
+        },
+        {
+          "type": "richtext",
+          "id": "content",
+          "label": "Content",
+          "default": "<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>"
+        },
+        {
+          "type": "text",
+          "id": "primary_button_text",
+          "label": "Primary Button Text",
+          "default": "Primary Button"
+        },
+        {
+          "type": "url",
+          "id": "primary_button_url",
+          "label": "Primary Button Url"
+        },
+        {
+          "type": "text",
+          "id": "secondary_button_text",
+          "label": "Secondary Button Text"
+        },
+        {
+          "type": "url",
+          "id": "secondary_button_url",
+          "label": "Secondary Button URL"
+        },
+        {
+          "type": "select",
+          "id": "horizontal_alignment",
+          "label": "Horizontal Alignment",
+          "options": [
+            { "value": "justify-left", "label": "Left" },
+            { "value": "justify-center", "label": "Center" },
+            { "value": "justify-right", "label": "Right" }
+          ],
+          "default": "justify-left"
+        },
+        {
+          "type": "select",
+          "id": "vertical_alignment",
+          "label": "Vertical Alignment",
+          "options": [
+            { "value": "align-top", "label": "Top" },
+            { "value": "align-middle", "label": "Middle" },
+            { "value": "align-bottom", "label": "Bottom" }
+          ],
+          "default": "align-middle"
+        },
+        {
+          "type": "liquid",
+          "id": "custom_styling",
+          "label": "Custom Styling"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "xBanner",
+      "category": "Custom Sections",
+      "blocks": [{ "type": "slide" }]
+    }
+  ]
+}
+{% endschema %}
