@@ -1,0 +1,90 @@
+{% comment %}
+  Renders one card in the custom product grid.
+
+  Takes explicit values rather than a product or a block, so the same renderer
+  serves both the collection-driven and the manually-built grid.
+
+  The per-card accent is passed in as inline custom properties (--hue, --tint,
+  --line) and every coloured part of the card reads them. That is the demo
+  store's own pattern: one ruleset, a different identity per card.
+
+  Markup only; styling lives in sections/custom-product-grid.liquid.
+
+  Accepts:
+  - title:  {String} card heading (required)
+  - url:    {String} link target (required)
+  - desc:   {String} short description
+  - image:  {Object} Shopify image; falls back to the blueprint grid when blank
+  - badge:  {String} pill in the top-right of the thumbnail
+  - dim:    {String} chip in the bottom-left of the thumbnail
+  - price:  {String} already formatted, e.g. "$85"
+  - prefix: {String} label before the price, e.g. "from"
+  - unit:   {String} label after the price, e.g. "m²"
+  - cta:    {String} call to action text
+  - hue:    {String} accent colour
+  - tint:   {String} thumbnail background
+  - line:   {String} blueprint grid line colour
+  - attrs:  {String} block.shopify_attributes, when rendered from a block
+
+  Usage:
+  {% render 'custom-product-grid-card', title: p.title, url: p.url, hue: hue %}
+{% endcomment %}
+
+<a
+  class="--pcard"
+  href="{{ url }}"
+  style="--hue: {{ hue }}; --tint: {{ tint }}; --line: {{ line }};"
+  {{ attrs }}
+>
+  <span class="--pcard-thumb">
+    {%- if image != blank -%}
+      {{
+        image
+        | image_url: width: 800
+        | image_tag:
+          class: '--pcard-image',
+          widths: '200, 300, 400, 600, 800',
+          sizes: '(min-width: 900px) 30vw, (min-width: 560px) 45vw, 90vw',
+          loading: 'lazy',
+          alt: title
+      }}
+    {%- else -%}
+      <span class="--pcard-grid" aria-hidden="true"></span>
+    {%- endif -%}
+
+    {%- if badge != blank -%}
+      <span class="--pcard-badge">{{ badge }}</span>
+    {%- endif -%}
+
+    {%- if dim != blank -%}
+      <span class="--pcard-dim">{{ dim }}</span>
+    {%- endif -%}
+  </span>
+
+  <span class="--pcard-body">
+    <span class="--pcard-title">{{ title }}</span>
+
+    {%- if desc != blank -%}
+      <span class="--pcard-desc">{{ desc }}</span>
+    {%- endif -%}
+
+    <span class="--pcard-row">
+      {%- if price != blank -%}
+        <span class="--pcard-from">
+          {%- if prefix != blank -%}{{ prefix }} {% endif -%}
+          <b>{{ price }}</b>
+          {%- if unit != blank %} / {{ unit }}{% endif -%}
+        </span>
+      {%- else -%}
+        <span class="--pcard-from"></span>
+      {%- endif -%}
+
+      {%- if cta != blank -%}
+        <span class="--pcard-go">
+          {{- cta -}}
+          {%- render 'custom-icons', name: 'arrow-right', size: 13 -%}
+        </span>
+      {%- endif -%}
+    </span>
+  </span>
+</a>

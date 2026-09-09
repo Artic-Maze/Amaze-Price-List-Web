@@ -1,274 +1,344 @@
 {
   "sections": {
-    "xicon_with_text_JWgNyH": {
-      "type": "xicon-with-text",
+    "hero": {
+      "type": "custom-hero",
       "blocks": {
-        "card_9ctihM": {
-          "type": "card",
-          "settings": { "title": "Title", "content": "<p>Lorem Ipsum<\/p>" }
+        "orbit_node-0": {
+          "type": "orbit_node",
+          "settings": {
+            "label": "Enter size",
+            "icon": "corners"
+          }
         },
-        "card_bDzJ8t": {
-          "type": "card",
-          "settings": { "title": "Title", "content": "<p>Lorem Ipsum<\/p>" }
+        "orbit_node-1": {
+          "type": "orbit_node",
+          "settings": {
+            "label": "Choose options",
+            "icon": "sliders"
+          }
         },
-        "card_wHdHtz": {
-          "type": "card",
-          "settings": { "title": "Title", "content": "<p>Lorem Ipsum<\/p>" }
-        }
-      },
-      "block_order": ["card_9ctihM", "card_bDzJ8t", "card_wHdHtz"],
-      "name": "xIcon With Text",
-      "settings": {
-        "full_width": false,
-        "navid": "",
-        "title": "Section Title",
-        "bg-color": "",
-        "margin_top": 0,
-        "margin_bottom": 0,
-        "padding_top": 50,
-        "padding_bottom": 50,
-        "margin_top_mobile": 0,
-        "margin_bottom_mobile": 0,
-        "padding_top_mobile": 20,
-        "padding_bottom_mobile": 20
-      }
-    },
-    "xcard_slider_f7AdjG": {
-      "type": "xcard-slider",
-      "blocks": {
-        "card_PJNJ4C": {
-          "type": "card",
-          "settings": { "title": "Title", "subtitle": "Subitle" }
+        "orbit_node-2": {
+          "type": "orbit_node",
+          "settings": {
+            "label": "Add to cart",
+            "icon": "bag"
+          }
         },
-        "card_VTpwLp": {
-          "type": "card",
-          "settings": { "title": "Title", "subtitle": "Subitle" }
+        "orbit_node-3": {
+          "type": "orbit_node",
+          "settings": {
+            "label": "Price builds",
+            "icon": "currency"
+          }
         },
-        "card_NGbURL": {
-          "type": "card",
-          "settings": { "title": "Title", "subtitle": "Subitle" }
+        "spec_row-4": {
+          "type": "spec_row",
+          "settings": {
+            "label": "Width",
+            "value": "120 cm"
+          }
         },
-        "card_PLayBX": {
-          "type": "card",
-          "settings": { "title": "Title", "subtitle": "Subitle" }
+        "spec_row-5": {
+          "type": "spec_row",
+          "settings": {
+            "label": "Drop",
+            "value": "160 cm"
+          }
         },
-        "card_BiG77Y": {
-          "type": "card",
-          "settings": { "title": "Title", "subtitle": "Subitle" }
+        "spec_row-6": {
+          "type": "spec_row",
+          "settings": {
+            "label": "Motorised",
+            "value": "Yes"
+          }
         },
-        "card_GgXmtE": {
-          "type": "card",
-          "settings": { "title": "Title", "subtitle": "Subitle" }
+        "chip-7": {
+          "type": "chip",
+          "settings": {
+            "text": "No coding",
+            "icon": "check"
+          }
+        },
+        "chip-8": {
+          "type": "chip",
+          "settings": {
+            "text": "Live pricing",
+            "icon": "check"
+          }
+        },
+        "chip-9": {
+          "type": "chip",
+          "settings": {
+            "text": "Any product",
+            "icon": "check"
+          }
+        },
+        "chip-10": {
+          "type": "chip",
+          "settings": {
+            "text": "Adds to cart",
+            "icon": "check"
+          }
         }
       },
       "block_order": [
-        "card_PJNJ4C",
-        "card_VTpwLp",
-        "card_NGbURL",
-        "card_PLayBX",
-        "card_BiG77Y",
-        "card_GgXmtE"
+        "orbit_node-0",
+        "orbit_node-1",
+        "orbit_node-2",
+        "orbit_node-3",
+        "spec_row-4",
+        "spec_row-5",
+        "spec_row-6",
+        "chip-7",
+        "chip-8",
+        "chip-9",
+        "chip-10"
       ],
-      "name": "xCard Slider",
       "settings": {
-        "full_width": false,
-        "navid": "",
-        "caption": "Caption",
-        "title": "Title",
-        "subtitle": "Subtitle",
-        "display-type": "slider",
-        "bg-color": "",
-        "button_label": "Show All",
         "margin_top": 0,
         "margin_bottom": 0,
-        "padding_top": 50,
-        "padding_bottom": 50,
         "margin_top_mobile": 0,
         "margin_bottom_mobile": 0,
-        "padding_top_mobile": 20,
-        "padding_bottom_mobile": 20
-      }
-    },
-    "ximage_with_text_eRKAQD": {
-      "type": "ximage-with-text",
-      "name": "xImage With Text",
-      "settings": {
         "full_width": false,
-        "navid": "",
-        "section_layout": "image_first",
-        "image": "shopify:\/\/shop_images\/house-plant-in-white-pot_925x_3c60d28e-8890-464b-a9d3-d1b3304a0b71.jpg",
-        "caption": "Caption",
-        "title": "Title",
-        "subtitle": "Subtitle",
-        "content": "<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text since 1966.<\/p>",
-        "button_label": "Button",
-        "button_url": "",
-        "bg-color": "",
-        "margin_top": 0,
-        "margin_bottom": 0,
-        "padding_top": 50,
-        "padding_bottom": 50,
-        "margin_top_mobile": 0,
-        "margin_bottom_mobile": 0,
-        "padding_top_mobile": 20,
-        "padding_bottom_mobile": 20
+        "navid": "hero",
+        "color_scheme": "scheme-1",
+        "accent_color": "#004EBA",
+        "eyebrow": "Custom pricing for Shopify",
+        "heading": "Turn any product into a <em>price builder</em>.",
+        "heading_tag": "h1",
+        "heading_size": 66,
+        "uppercase_heading": false,
+        "lede": "<p>Customers set their own options and the price is worked out on the spot — no quote forms, no waiting. The number they see is the number they pay.</p>",
+        "cta_primary_label": "Try a calculator",
+        "cta_primary_link": "",
+        "cta_secondary_label": "Shop all",
+        "cta_secondary_link": "",
+        "column_ratio": "1.05fr 0.95fr",
+        "reverse": false,
+        "vertical_align": "center",
+        "orbit_size": 470,
+        "orbit_size_mobile": 350,
+        "show_ring": true,
+        "show_dots": true,
+        "show_sparks": true,
+        "mock_brand": "Amaze",
+        "mock_nav": "Home, Calculators, Link products, Theme",
+        "mock_nav_active": 2,
+        "mock_section_label": "Calculators",
+        "mock_action_label": "+ New",
+        "mock_title": "Roller blinds",
+        "mock_total_label": "Price",
+        "mock_total_value": "$324.00",
+        "mock_button": "View calculator",
+        "bg_color": "",
+        "text_color": "",
+        "padding_top": 56,
+        "padding_bottom": 60,
+        "padding_top_mobile": 32,
+        "padding_bottom_mobile": 36
       }
     },
-    "xbanner_c6MLp9": {
-      "type": "xbanner",
+    "steps": {
+      "type": "custom-steps",
       "blocks": {
-        "slide_mt8deP": {
-          "type": "slide",
+        "step-0": {
+          "type": "step",
           "settings": {
-            "media_type": "image",
-            "loading_priority": "lazy",
-            "banner_overlay": 5,
-            "banner_caption": "Caption",
-            "title": "Banner Title",
-            "heading_type": "h1",
-            "content": "<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.<\/p>",
-            "primary_button_text": "Primary Button",
-            "primary_button_url": "",
-            "secondary_button_text": "",
-            "secondary_button_url": "",
-            "horizontal_alignment": "justify-left",
-            "vertical_alignment": "align-middle",
-            "custom_styling": ""
+            "title": "Enter your size",
+            "text": "<p>Type your width and height, or the area you need — every field is range-checked.</p>",
+            "icon": "none",
+            "number": "",
+            "link_label": "",
+            "link": ""
           }
         },
-        "slide_BqbUeB": {
-          "type": "slide",
+        "step-1": {
+          "type": "step",
           "settings": {
-            "media_type": "image",
-            "loading_priority": "lazy",
-            "banner_overlay": 5,
-            "banner_caption": "Caption",
-            "title": "Banner Title",
-            "heading_type": "h1",
-            "content": "<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.<\/p>",
-            "primary_button_text": "Primary Button",
-            "primary_button_url": "",
-            "secondary_button_text": "",
-            "secondary_button_url": "",
-            "horizontal_alignment": "justify-left",
-            "vertical_alignment": "align-middle",
-            "custom_styling": ""
+            "title": "Choose your options",
+            "text": "<p>Material, thickness, finish, add-ons — each one adjusts the price as you go.</p>",
+            "icon": "none",
+            "number": "",
+            "link_label": "",
+            "link": ""
+          }
+        },
+        "step-2": {
+          "type": "step",
+          "settings": {
+            "title": "Price builds live",
+            "text": "<p>The total updates instantly and carries to cart with your exact spec attached.</p>",
+            "icon": "none",
+            "number": "",
+            "link_label": "",
+            "link": ""
           }
         }
       },
-      "block_order": ["slide_mt8deP", "slide_BqbUeB"],
-      "name": "xBanner",
+      "block_order": [
+        "step-0",
+        "step-1",
+        "step-2"
+      ],
       "settings": {
-        "full_width": true,
-        "navid": "",
-        "bg-color": "",
         "margin_top": 0,
         "margin_bottom": 0,
-        "padding_top": 0,
-        "padding_bottom": 0,
         "margin_top_mobile": 0,
         "margin_bottom_mobile": 0,
+        "full_width": false,
+        "navid": "steps",
+        "color_scheme": "scheme-1",
+        "accent_color": "#004EBA",
+        "columns": 3,
+        "alignment": "left",
+        "show_dividers": true,
+        "show_top_border": true,
+        "show_bottom_border": true,
+        "step_padding_y": 30,
+        "step_padding_x": 28,
+        "auto_number": true,
+        "title_size": 17,
+        "uppercase_title": false,
+        "bg_color": "",
+        "text_color": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
         "padding_top_mobile": 0,
         "padding_bottom_mobile": 0
       }
     },
-    "xcollection_tab_EnGXCQ": {
-      "type": "xfeatured-collection-tab",
+    "products": {
+      "type": "custom-product-grid",
       "blocks": {
-        "tab_LcfBpB": {
-          "type": "tab",
-          "settings": { "tab_title": "All", "collection": "all" }
-        }
-      },
-      "block_order": ["tab_LcfBpB"],
-      "disabled": true,
-      "name": "xCollection Tab",
-      "settings": {
-        "full_width": false,
-        "navid": "",
-        "caption": "Caption",
-        "title": "Title",
-        "subtitle": "Subtitle",
-        "display-type": "slider",
-        "bg-color": "",
-        "button_label": "Show All",
-        "margin_top": 0,
-        "margin_bottom": 0,
-        "padding_top": 50,
-        "padding_bottom": 50,
-        "margin_top_mobile": 0,
-        "margin_bottom_mobile": 0,
-        "padding_top_mobile": 20,
-        "padding_bottom_mobile": 20
-      }
-    },
-    "xcustom_elements_7zefRz": {
-      "type": "xcustom-elements",
-      "blocks": {
-        "caption_A3mj8q": {
-          "type": "caption",
-          "settings": { "title": "Caption", "style": "style_1" }
-        },
-        "title_qXDBGg": {
-          "type": "title",
-          "settings": { "title": "Section Title" }
-        },
-        "content_6qLFBf": {
-          "type": "content",
+        "card-0": {
+          "type": "card",
           "settings": {
-            "title": "<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.<\/p>"
+            "title": "Roller Blinds",
+            "desc": "Cut to your recess. Optional motorised control.",
+            "link": "",
+            "image": "",
+            "badge": "Area pricing",
+            "dim": "W × H",
+            "price": "$85",
+            "unit": "m²",
+            "accent_color": "",
+            "tint_color": ""
           }
         },
-        "button_4MLWJq": {
-          "type": "button",
+        "card-1": {
+          "type": "card",
           "settings": {
-            "open_in_new_tab": false,
-            "primary_button_title": "Primary Button",
-            "primary_button_url": "",
-            "primary_button_style": "primary-button",
-            "secondary_button_title": "Secondary Button",
-            "secondary_button_url": "",
-            "secondary_button_style": "secondary-button"
+            "title": "Cut-to-Size Glass & Acrylic",
+            "desc": "Any panel, any thickness. Polished or bevelled edges.",
+            "link": "",
+            "image": "",
+            "badge": "Thickness ×",
+            "dim": "mm",
+            "price": "$120",
+            "unit": "m²",
+            "accent_color": "",
+            "tint_color": ""
           }
         },
-        "image_kBpymF": {
-          "type": "image",
+        "card-2": {
+          "type": "card",
           "settings": {
-            "image": "shopify:\/\/shop_images\/picket-fence-flowers_925x_2e1d609e-108c-49d4-986b-70a4020e3a8f.jpg"
+            "title": "Custom Vinyl Banner",
+            "desc": "Your text and size. Eyelets, material and rush options.",
+            "link": "",
+            "image": "",
+            "badge": "Custom text",
+            "dim": "rush?",
+            "price": "$22",
+            "unit": "m²",
+            "accent_color": "",
+            "tint_color": ""
+          }
+        },
+        "card-3": {
+          "type": "card",
+          "settings": {
+            "title": "Wallpaper & Wall Murals",
+            "desc": "Measure the wall, pick a finish — we round to full rolls.",
+            "link": "",
+            "image": "",
+            "badge": "Rounds to rolls",
+            "dim": "m² → rolls",
+            "price": "$48",
+            "unit": "roll",
+            "accent_color": "",
+            "tint_color": ""
+          }
+        },
+        "card-4": {
+          "type": "card",
+          "settings": {
+            "title": "Composite Decking",
+            "desc": "Enter your area, add a cutting allowance and fixings kit.",
+            "link": "",
+            "image": "",
+            "badge": "Waste + min",
+            "dim": "m²",
+            "price": "$39",
+            "unit": "m²",
+            "accent_color": "",
+            "tint_color": ""
           }
         }
       },
       "block_order": [
-        "caption_A3mj8q",
-        "title_qXDBGg",
-        "content_6qLFBf",
-        "button_4MLWJq",
-        "image_kBpymF"
+        "card-0",
+        "card-1",
+        "card-2",
+        "card-3",
+        "card-4"
       ],
-      "name": "xCustom Element",
       "settings": {
         "full_width": false,
-        "navid": "",
-        "content-color": "",
-        "bg-color": "",
+        "navid": "products",
+        "color_scheme": "scheme-1",
+        "heading": "Custom pricing on every product",
+        "subheading": "<p>Each product is priced by its own calculator. Open any one to build your price.</p>",
+        "heading_size": 32,
+        "uppercase_heading": false,
+        "header_alignment": "left",
+        "header_gap": 28,
+        "source": "blocks",
+        "collection": "",
+        "products_to_show": 6,
+        "show_images": true,
+        "metafield_namespace": "custom",
+        "metafield_badge": "",
+        "metafield_dim": "",
+        "metafield_unit": "",
+        "columns": 3,
+        "grid_gap": 22,
+        "image_ratio": "4 / 3",
+        "card_title_size": 17,
+        "grid_motif_size": 22,
+        "hover_lift": true,
+        "price_prefix": "from",
+        "price_unit": "m²",
+        "cta_label": "Build price",
+        "vary_accents": true,
+        "accent_color": "#004EBA",
+        "tint_color": "#EDF4FC",
+        "bg_color": "",
+        "text_color": "",
         "margin_top": 0,
         "margin_bottom": 0,
-        "padding_top": 50,
-        "padding_bottom": 50,
+        "padding_top": 64,
+        "padding_bottom": 64,
         "margin_top_mobile": 0,
         "margin_bottom_mobile": 0,
-        "padding_top_mobile": 20,
-        "padding_bottom_mobile": 20,
-        "custom_liquid": ""
+        "padding_top_mobile": 40,
+        "padding_bottom_mobile": 40
       }
     }
   },
   "order": [
-    "xicon_with_text_JWgNyH",
-    "xcard_slider_f7AdjG",
-    "ximage_with_text_eRKAQD",
-    "xbanner_c6MLp9",
-    "xcollection_tab_EnGXCQ",
-    "xcustom_elements_7zefRz"
+    "hero",
+    "steps",
+    "products"
   ]
 }

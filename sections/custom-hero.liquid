@@ -1,0 +1,962 @@
+{% comment %}
+  Custom hero.
+
+  Structure follows sections/base.liquid: a scoped style block keyed on
+  section.id, a .section-container--{{ section.id }} wrapper carrying the
+  spacing settings, a .section-wrapper--{{ section.id }} inner, then the schema.
+
+  Layout and content follow made-and-measured-demo-store.html: a two-column
+  grid with the pitch on the left (eyebrow pill, two-tone headline, lede, two
+  buttons, reassurance chips) and the orbit visual on the right.
+
+  Markup is split into snippets/custom-hero-content.liquid and
+  snippets/custom-hero-visual.liquid. No JavaScript — the whole section is
+  static markup and CSS.
+{% endcomment %}
+
+{%- liquid
+  assign accent = section.settings.accent_color | default: '#004EBA'
+  assign orbit_size = section.settings.orbit_size | default: 470
+  assign ratio = section.settings.column_ratio | default: '1.05fr 0.95fr'
+-%}
+
+<style>
+  .section-container--{{ section.id }} {
+    --hero-accent: {{ accent }};
+    --orbit-size: {{ orbit_size | append: 'px' }};
+    /* Nodes ride just inside the ring: half the box, less the icon radius. */
+    --orbit-r: calc(var(--orbit-size) / 2 - 3.4rem);
+    margin-top: {{ section.settings.margin_top | append: 'px' }};
+    margin-bottom: {{ section.settings.margin_bottom | append: 'px' }};
+    padding-top: {{ section.settings.padding_top | append: 'px' }};
+    padding-bottom: {{ section.settings.padding_bottom | append: 'px' }};
+    {% if section.settings.bg_color != blank %}background: {{ section.settings.bg_color }};{% endif %}
+    {% if section.settings.text_color != blank %}color: {{ section.settings.text_color }};{% endif %}
+    position: relative;
+    overflow: hidden;
+  }
+
+  .section-wrapper--{{ section.id }} {
+    display: grid;
+    grid-template-columns: {{ ratio }};
+    gap: var(--global-spacing-56, 5.6rem);
+    align-items: {{ section.settings.vertical_align | default: 'center' }};
+  }
+
+  .section-container--{{ section.id }} {
+    /* ---- content column ---- */
+    .--hero-content {
+      min-width: 0;
+      {% if section.settings.reverse %}order: 2;{% endif %}
+    }
+
+    .--hero-eyebrow {
+      display: inline-block;
+      margin-bottom: var(--global-spacing-24, 2.4rem);
+      padding: 0.6rem 1.3rem;
+      background: var(--global-color-ocean-100, #edf4fc);
+      border: var(--fds-border-width-fine, 0.1rem) solid var(--global-color-ocean-200, #c5daf7);
+      border-radius: var(--fds-radii-relaxed, 10rem);
+      color: var(--hero-accent);
+      font-family: var(--fds-type-meta-family, inherit);
+      font-size: var(--fds-type-meta-size, 1.2rem);
+      font-weight: var(--global-type-weight-skandia-bold, 700);
+      line-height: 1;
+      text-transform: var(--global-type-case-upper, uppercase);
+      letter-spacing: 0.08em;
+    }
+
+    .--hero-heading {
+      margin: 0 0 var(--global-spacing-20, 2rem);
+      font-family: var(--fds-type-display-family, inherit);
+      font-weight: var(--fds-type-display-weight, 800);
+      font-size: clamp(3.2rem, 6vw, {{ section.settings.heading_size | append: 'px' }});
+      line-height: var(--fds-type-display-leading, 0.9);
+      letter-spacing: var(--global-type-letterspacing-0pc, 0);
+      {% if section.settings.uppercase_heading %}text-transform: var(--global-type-case-upper, uppercase);{% endif %}
+      color: rgb(var(--color-foreground, 13, 16, 18));
+    }
+
+    /* The editor's italic control marks the accent phrase; render it as
+       colour rather than italics. */
+    .--hero-heading em {
+      font-style: normal;
+      color: var(--hero-accent);
+    }
+
+    .--hero-lede {
+      margin: 0 0 var(--global-spacing-24, 2.4rem);
+      max-width: 44ch;
+      color: var(--fds-color-text-muted, #767a7f);
+      font-family: var(--fds-type-callout-family, inherit);
+      font-size: var(--fds-type-callout-size, 1.8rem);
+      line-height: var(--fds-type-callout-leading, 1.4);
+    }
+
+    .--hero-lede p {
+      margin: 0 0 1rem;
+    }
+
+    .--hero-lede p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* ---- buttons ---- */
+    .--hero-cta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--global-spacing-16, 1.6rem);
+    }
+
+    .--btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.9rem;
+      padding: 1.3rem 2.2rem;
+      border: var(--fds-border-width-regular, 0.2rem) solid transparent;
+      border-radius: var(--fds-radii-angled, 0);
+      text-decoration: none;
+      white-space: nowrap;
+      font-family: var(--fds-type-body-family, inherit);
+      font-size: var(--global-type-size-14, 1.4rem);
+      font-weight: var(--global-type-weight-skandia-bold, 700);
+      line-height: 1;
+      text-transform: var(--global-type-case-upper, uppercase);
+      letter-spacing: 0.08em;
+      transition: background-color var(--duration-default, 200ms) var(--ease-out, ease-out),
+        border-color var(--duration-default, 200ms) var(--ease-out, ease-out),
+        color var(--duration-default, 200ms) var(--ease-out, ease-out);
+    }
+
+    .--btn svg {
+      flex: none;
+      transition: transform var(--duration-default, 200ms) var(--ease-out, ease-out);
+    }
+
+    .--btn:hover svg {
+      transform: translateX(0.3rem);
+    }
+
+    .--btn-primary {
+      background: var(--fds-color-surface-inverse, #0d1012);
+      color: var(--fds-color-text-inverse, #fff);
+    }
+
+    .--btn-primary:hover {
+      background: var(--global-color-neutral-800, #1b1d22);
+    }
+
+    .--btn-ghost {
+      background: transparent;
+      color: var(--fds-color-text-default, #0d1012);
+      border-color: var(--fds-color-border-default, #dee0e3);
+    }
+
+    .--btn-ghost:hover {
+      border-color: var(--fds-color-border-strong, #0d1012);
+    }
+
+    /* ---- chips ---- */
+    .--hero-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--global-spacing-8, 0.8rem);
+      margin: var(--global-spacing-24, 2.4rem) 0 0;
+      padding: 0;
+    }
+
+    .--hero-chip {
+      list-style: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0.7rem 1.2rem;
+      background: var(--fds-color-surface-default, #fff);
+      border: var(--fds-border-width-fine, 0.1rem) solid var(--fds-color-border-default, #dee0e3);
+      border-radius: var(--fds-radii-angled, 0);
+      color: var(--fds-color-text-muted, #767a7f);
+      font-family: var(--fds-type-body-family, inherit);
+      font-size: var(--global-type-size-12, 1.2rem);
+    }
+
+    .--hero-chip svg {
+      flex: none;
+      color: var(--fds-color-feedback-positive, #009966);
+    }
+
+    /* ---- visual column ---- */
+    .--hero-visual {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 0;
+      {% if section.settings.reverse %}order: 1;{% endif %}
+    }
+
+    .--hero-image {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .--orbit {
+      position: relative;
+      width: 100%;
+      max-width: var(--orbit-size);
+      aspect-ratio: 1 / 1;
+      margin: 0 auto;
+    }
+
+    .--orbit-ring {
+      position: absolute;
+      inset: 1.6rem;
+      border: var(--fds-border-width-regular, 0.2rem) dashed var(--fds-color-border-default, #dee0e3);
+      border-radius: 50%;
+    }
+
+    .--orbit-dots {
+      position: absolute;
+      width: 6.6rem;
+      height: 4.6rem;
+      background-image: radial-gradient(var(--fds-color-border-default, #dee0e3) 1.4px, transparent 1.4px);
+      background-size: 1.1rem 1.1rem;
+      opacity: 0.85;
+      pointer-events: none;
+    }
+
+    .--orbit-dots.--at-tr {
+      top: 0.2rem;
+      right: -0.4rem;
+    }
+
+    .--orbit-dots.--at-bl {
+      bottom: 0.2rem;
+      left: -0.4rem;
+    }
+
+    .--orbit-spark {
+      position: absolute;
+      color: var(--hero-accent);
+      font-size: 1.7rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .--orbit-spark.--at-1 {
+      top: 4.6rem;
+      left: 0.2rem;
+    }
+
+    .--orbit-spark.--at-2 {
+      bottom: 5.8rem;
+      right: 1rem;
+    }
+
+    .--orbit-nodes {
+      position: absolute;
+      inset: 0;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Rotate out to the ring, then counter-rotate so the label stays upright.
+       --angle is computed per node in the snippet, so any node count works. */
+    .--orbit-node {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 8.6rem;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.7rem;
+      text-align: center;
+      color: var(--fds-color-text-muted, #767a7f);
+      font-family: var(--fds-type-meta-family, inherit);
+      font-size: 1rem;
+      line-height: 1.3;
+      text-transform: var(--global-type-case-upper, uppercase);
+      letter-spacing: 0.06em;
+      transform: translate(-50%, -50%) rotate(var(--angle)) translateY(calc(-1 * var(--orbit-r)))
+        rotate(calc(-1 * var(--angle)));
+    }
+
+    .--orbit-node-icon {
+      width: 4.2rem;
+      height: 4.2rem;
+      flex: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: var(--fds-color-surface-default, #fff);
+      border: var(--fds-border-width-fine, 0.1rem) solid var(--fds-color-border-default, #dee0e3);
+      color: var(--hero-accent);
+    }
+
+    /* ---- centred app-window mock ---- */
+    .--appwin {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 76%;
+      display: flex;
+      overflow: hidden;
+      background: var(--fds-color-surface-default, #fff);
+      border: var(--fds-border-width-fine, 0.1rem) solid var(--fds-color-border-default, #dee0e3);
+      border-radius: var(--fds-radii-angled, 0);
+      box-shadow: var(--box-shadow-large, 0 4px 60px 0 rgba(0, 0, 0, 0.1));
+    }
+
+    .--aw-side {
+      width: 40%;
+      padding: 1.2rem 0.9rem;
+      background: var(--fds-color-surface-inverse, #0d1012);
+    }
+
+    .--aw-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 1.2rem;
+      color: var(--fds-color-text-inverse, #fff);
+      font-family: var(--fds-type-title-family, inherit);
+      font-weight: var(--fds-type-title-weight, 800);
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+
+    .--aw-logo {
+      width: 1.6rem;
+      height: 1.6rem;
+      flex: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--hero-accent);
+      color: var(--fds-color-text-inverse, #fff);
+      border-radius: var(--fds-radii-angled, 0);
+      font-size: 1rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .--aw-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .--aw-item {
+      padding: 0.5rem 0.7rem;
+      border-radius: var(--fds-radii-angled, 0);
+      color: var(--global-color-neutral-400, #9fa3a8);
+      font-family: var(--fds-type-body-family, inherit);
+      font-size: 0.95rem;
+      line-height: 1.3;
+    }
+
+    .--aw-item.is-on {
+      background: var(--fds-color-overlay-on-dark, rgba(255, 255, 255, 0.15));
+      color: var(--fds-color-text-inverse, #fff);
+    }
+
+    .--aw-main {
+      flex: 1 1 auto;
+      min-width: 0;
+      padding: 1.2rem;
+    }
+
+    .--aw-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 0.9rem;
+      color: var(--fds-color-text-muted, #767a7f);
+      font-family: var(--fds-type-body-family, inherit);
+      font-size: 0.95rem;
+    }
+
+    .--aw-add {
+      color: var(--hero-accent);
+      font-weight: var(--global-type-weight-skandia-bold, 700);
+      white-space: nowrap;
+    }
+
+    .--aw-card {
+      padding: 1.1rem 1.2rem;
+      background: var(--global-color-neutral-100, #f4f5f6);
+      border: var(--fds-border-width-fine, 0.1rem) solid var(--fds-color-border-default, #dee0e3);
+      border-radius: var(--fds-radii-angled, 0);
+    }
+
+    .--awc-title {
+      margin-bottom: 0.8rem;
+      font-family: var(--fds-type-title-family, inherit);
+      font-weight: var(--fds-type-title-weight, 800);
+      font-size: 1.2rem;
+      line-height: 1.1;
+    }
+
+    .--awc-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.8rem;
+      padding: 0.2rem 0;
+      color: var(--fds-color-text-muted, #767a7f);
+      font-family: var(--fds-type-body-family, inherit);
+      font-size: 1rem;
+    }
+
+    .--awc-row b {
+      color: var(--fds-color-text-default, #0d1012);
+      font-family: var(--fds-type-meta-family, inherit);
+      font-weight: var(--global-type-weight-skandia-bold, 700);
+    }
+
+    /* Dashed rule above a total — the demo's receipt motif. */
+    .--awc-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.8rem;
+      margin-top: 0.7rem;
+      padding-top: 0.7rem;
+      border-top: var(--fds-border-width-fine, 0.1rem) dashed var(--fds-color-border-default, #dee0e3);
+    }
+
+    .--awc-total span {
+      color: var(--fds-color-text-muted, #767a7f);
+      font-size: 0.95rem;
+    }
+
+    .--awc-total b {
+      color: var(--fds-color-text-default, #0d1012);
+      font-family: var(--fds-type-title-family, inherit);
+      font-weight: var(--fds-type-title-weight, 800);
+      font-size: 1.6rem;
+      line-height: 1;
+    }
+
+    .--awc-btn {
+      margin-top: 1rem;
+      padding: 0.8rem;
+      background: var(--fds-color-surface-inverse, #0d1012);
+      color: var(--fds-color-text-inverse, #fff);
+      border-radius: var(--fds-radii-angled, 0);
+      text-align: center;
+      font-family: var(--fds-type-body-family, inherit);
+      font-size: 1rem;
+      font-weight: var(--global-type-weight-skandia-bold, 700);
+      text-transform: var(--global-type-case-upper, uppercase);
+      letter-spacing: 0.06em;
+    }
+  }
+
+  @media screen and (max-width: 940px) {
+    .section-wrapper--{{ section.id }} {
+      grid-template-columns: 1fr;
+      gap: var(--global-spacing-32, 3.2rem);
+    }
+
+    .section-container--{{ section.id }} {
+      --orbit-size: {{ section.settings.orbit_size_mobile | append: 'px' }};
+    }
+
+    .section-container--{{ section.id }} .--hero-content,
+    .section-container--{{ section.id }} .--hero-visual {
+      order: 0;
+    }
+
+    .section-container--{{ section.id }} .--hero-lede {
+      max-width: none;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .section-container--{{ section.id }} {
+      margin-top: {{ section.settings.margin_top_mobile | append: 'px' }};
+      margin-bottom: {{ section.settings.margin_bottom_mobile | append: 'px' }};
+      padding-top: {{ section.settings.padding_top_mobile | append: 'px' }};
+      padding-bottom: {{ section.settings.padding_bottom_mobile | append: 'px' }};
+    }
+
+    .section-container--{{ section.id }} .--hero-cta {
+      gap: var(--global-spacing-8, 0.8rem);
+    }
+
+    .section-container--{{ section.id }} .--btn {
+      flex: 1 1 auto;
+      justify-content: center;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .section-container--{{ section.id }} * {
+      transition-duration: 1ms !important;
+    }
+  }
+</style>
+
+<section
+  class="section-container--{{ section.id }} color-{{ section.settings.color_scheme }}"
+  id="{{ section.settings.navid | default: 'hero' }}"
+>
+  <div class="section-wrapper--{{ section.id }}{% if section.settings.full_width != true %} page-width{% endif %}">
+    {%- render 'custom-hero-content', section: section -%}
+    {%- render 'custom-hero-visual', section: section -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Custom Hero",
+  "tag": "section",
+  "class": "custom-hero-section",
+  "max_blocks": 16,
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full Width Section",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "navid",
+      "label": "Id(for navigation)",
+      "default": "hero"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "#004EBA",
+      "info": "Used by the eyebrow pill, the headline accent, the orbit icons and the mock."
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Custom pricing for Shopify"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Turn any product into a <em>price builder</em>.",
+      "info": "Use the italic control to mark the phrase that should take the accent color."
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Heading level",
+      "options": [
+        { "value": "h1", "label": "H1 — page headline" },
+        { "value": "h2", "label": "H2 — secondary" }
+      ],
+      "default": "h1",
+      "info": "Use H1 once per page. On the homepage this is usually it."
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "min": 32,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "label": "Heading max size",
+      "default": 66
+    },
+    {
+      "type": "checkbox",
+      "id": "uppercase_heading",
+      "label": "Uppercase heading",
+      "default": false
+    },
+    {
+      "type": "richtext",
+      "id": "lede",
+      "label": "Lede",
+      "default": "<p>Customers set their own options and the price is worked out on the spot — no quote forms, no waiting. The number they see is the number they pay.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Buttons"
+    },
+    {
+      "type": "text",
+      "id": "cta_primary_label",
+      "label": "Primary button",
+      "default": "Try a calculator"
+    },
+    {
+      "type": "url",
+      "id": "cta_primary_link",
+      "label": "Primary button link"
+    },
+    {
+      "type": "text",
+      "id": "cta_secondary_label",
+      "label": "Secondary button",
+      "default": "Shop all"
+    },
+    {
+      "type": "url",
+      "id": "cta_secondary_link",
+      "label": "Secondary button link"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "column_ratio",
+      "label": "Column ratio",
+      "options": [
+        { "value": "1.05fr 0.95fr", "label": "Balanced (demo store)" },
+        { "value": "1fr 1fr", "label": "Equal halves" },
+        { "value": "1.3fr 0.7fr", "label": "Content-heavy" },
+        { "value": "0.8fr 1.2fr", "label": "Visual-heavy" }
+      ],
+      "default": "1.05fr 0.95fr"
+    },
+    {
+      "type": "checkbox",
+      "id": "reverse",
+      "label": "Visual on the left",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "vertical_align",
+      "label": "Vertical alignment",
+      "options": [
+        { "value": "center", "label": "Center" },
+        { "value": "start", "label": "Top" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Visual"
+    },
+    {
+      "type": "image_picker",
+      "id": "visual_image",
+      "label": "Image",
+      "info": "Replaces the orbit mock entirely when set."
+    },
+    {
+      "type": "range",
+      "id": "orbit_size",
+      "min": 300,
+      "max": 640,
+      "step": 10,
+      "unit": "px",
+      "label": "Orbit size",
+      "default": 470
+    },
+    {
+      "type": "range",
+      "id": "orbit_size_mobile",
+      "min": 240,
+      "max": 480,
+      "step": 10,
+      "unit": "px",
+      "label": "Orbit size (Mobile)",
+      "default": 350
+    },
+    {
+      "type": "checkbox",
+      "id": "show_ring",
+      "label": "Show dashed ring",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dots",
+      "label": "Show dot grids",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sparks",
+      "label": "Show accent sparks",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "App window mock"
+    },
+    {
+      "type": "text",
+      "id": "mock_brand",
+      "label": "Brand name",
+      "default": "Amaze"
+    },
+    {
+      "type": "text",
+      "id": "mock_nav",
+      "label": "Sidebar items",
+      "default": "Home, Calculators, Link products, Theme",
+      "info": "Comma separated."
+    },
+    {
+      "type": "range",
+      "id": "mock_nav_active",
+      "min": 1,
+      "max": 8,
+      "step": 1,
+      "label": "Highlighted sidebar item",
+      "default": 2
+    },
+    {
+      "type": "text",
+      "id": "mock_section_label",
+      "label": "Panel label",
+      "default": "Calculators"
+    },
+    {
+      "type": "text",
+      "id": "mock_action_label",
+      "label": "Panel action",
+      "default": "+ New"
+    },
+    {
+      "type": "text",
+      "id": "mock_title",
+      "label": "Card title",
+      "default": "Roller blinds"
+    },
+    {
+      "type": "text",
+      "id": "mock_total_label",
+      "label": "Total label",
+      "default": "Price"
+    },
+    {
+      "type": "text",
+      "id": "mock_total_value",
+      "label": "Total value",
+      "default": "$324.00"
+    },
+    {
+      "type": "text",
+      "id": "mock_button",
+      "label": "Card button",
+      "default": "View calculator"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "info": "Overrides the color scheme when set."
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color"
+    },
+    {
+      "type": "header",
+      "content": "Desktop Spacing"
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Bottom",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Mobile Spacing"
+    },
+    {
+      "type": "range",
+      "id": "margin_top_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Top (Mobile)",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Bottom (Mobile)",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Top (Mobile)",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Bottom (Mobile)",
+      "default": 36
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Chip",
+      "type": "chip",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Live pricing"
+        },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "none", "label": "None" },
+            { "value": "check", "label": "Check" },
+            { "value": "spark", "label": "Spark" },
+            { "value": "ruler", "label": "Ruler" },
+            { "value": "truck", "label": "Delivery" },
+            { "value": "return", "label": "Returns" },
+            { "value": "star", "label": "Star" }
+          ],
+          "default": "check"
+        }
+      ]
+    },
+    {
+      "name": "Orbit node",
+      "type": "orbit_node",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Enter size"
+        },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "corners", "label": "Size" },
+            { "value": "sliders", "label": "Options" },
+            { "value": "bag", "label": "Cart" },
+            { "value": "currency", "label": "Price" },
+            { "value": "ruler", "label": "Ruler" },
+            { "value": "spark", "label": "Spark" },
+            { "value": "check", "label": "Check" }
+          ],
+          "default": "corners"
+        }
+      ]
+    },
+    {
+      "name": "Mock spec row",
+      "type": "spec_row",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Width"
+        },
+        {
+          "type": "text",
+          "id": "value",
+          "label": "Value",
+          "default": "120 cm"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Hero",
+      "category": "Custom Sections",
+      "blocks": [
+        { "type": "orbit_node", "settings": { "label": "Enter size", "icon": "corners" } },
+        { "type": "orbit_node", "settings": { "label": "Choose options", "icon": "sliders" } },
+        { "type": "orbit_node", "settings": { "label": "Add to cart", "icon": "bag" } },
+        { "type": "orbit_node", "settings": { "label": "Price builds", "icon": "currency" } },
+        { "type": "spec_row", "settings": { "label": "Width", "value": "120 cm" } },
+        { "type": "spec_row", "settings": { "label": "Drop", "value": "160 cm" } },
+        { "type": "spec_row", "settings": { "label": "Motorised", "value": "Yes" } },
+        { "type": "chip", "settings": { "text": "No coding", "icon": "check" } },
+        { "type": "chip", "settings": { "text": "Live pricing", "icon": "check" } },
+        { "type": "chip", "settings": { "text": "Any product", "icon": "check" } },
+        { "type": "chip", "settings": { "text": "Adds to cart", "icon": "check" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

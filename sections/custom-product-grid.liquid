@@ -1,0 +1,848 @@
+{% comment %}
+  Custom product grid.
+
+  Structure follows sections/base.liquid: a scoped style block keyed on
+  section.id, a .section-container--{{ section.id }} wrapper carrying the
+  spacing settings, a .section-wrapper--{{ section.id }} inner, then the schema.
+
+  Layout and content follow the "Custom pricing on every product" section in
+  made-and-measured-demo-store.html: a section heading over a three-up grid of
+  cards, each with a tinted blueprint thumbnail, a badge, a dimension chip, a
+  "from" rate and a build-price call to action.
+
+  Two sources:
+  - Collection — real products. Badge, dimension and unit are read from
+    metafields whose namespace and keys the merchant sets, so nothing is
+    hard-coded to one data model. Missing metafields simply omit the element.
+  - Cards — manual blocks, for a landing page that is not backed by products.
+
+  Each card carries its own accent as inline custom properties. With
+  "Vary accents" on, the palette cycles by position via `modulo`.
+
+  No JavaScript.
+{% endcomment %}
+
+{%- liquid
+  assign source = section.settings.source | default: 'collection'
+  assign columns = section.settings.columns | default: 3
+  assign cards = section.blocks | where: 'type', 'card'
+
+  comment
+    Categorical palette in the demo's five slots, mapped onto the Gymshark
+    ramps: ocean-500, green-600, yellow-600, tier-4 plum, brand-steel.
+    The two tints marked derived have no token of their own.
+  endcomment
+  assign palette = '#004EBA,#006644,#C17E01,#7D405F,#495C63' | split: ','
+  assign tints = '#EDF4FC,#E1F4EE,#FFF8EB,#F3ECEF,#EEF1F2' | split: ','
+
+  assign ns = section.settings.metafield_namespace
+-%}
+
+<style>
+  .section-container--{{ section.id }} {
+    margin-top: {{ section.settings.margin_top | append: 'px' }};
+    margin-bottom: {{ section.settings.margin_bottom | append: 'px' }};
+    padding-top: {{ section.settings.padding_top | append: 'px' }};
+    padding-bottom: {{ section.settings.padding_bottom | append: 'px' }};
+    {% if section.settings.bg_color != blank %}background: {{ section.settings.bg_color }};{% endif %}
+    {% if section.settings.text_color != blank %}color: {{ section.settings.text_color }};{% endif %}
+  }
+
+  .section-wrapper--{{ section.id }} {
+    display: flex;
+    flex-direction: column;
+    gap: {{ section.settings.header_gap | append: 'px' }};
+  }
+
+  .section-container--{{ section.id }} {
+    /* ---- section heading ---- */
+    .--grid-top {
+      text-align: {{ section.settings.header_alignment | default: 'left' }};
+      {% if section.settings.header_alignment == 'center' %}margin-inline: auto;{% endif %}
+      max-width: {% if section.settings.header_alignment == 'center' %}var(--fds-size-text-max-width, 90rem){% else %}none{% endif %};
+    }
+
+    .--grid-heading {
+      margin: 0;
+      color: rgb(var(--color-foreground, 13, 16, 18));
+      font-family: var(--fds-type-title-family, inherit);
+      font-weight: var(--fds-type-title-weight, 800);
+      font-size: clamp(2.4rem, 4vw, {{ section.settings.heading_size | append: 'px' }});
+      line-height: var(--fds-type-title-leading, 0.9);
+      letter-spacing: var(--global-type-letterspacing-0pc, 0);
+      {% if section.settings.uppercase_heading %}text-transform: var(--global-type-case-upper, uppercase);{% endif %}
+    }
+
+    .--grid-sub {
+      margin: 0.6rem 0 0;
+      color: var(--fds-color-text-muted, #767a7f);
+      font-family: var(--fds-type-body-family, inherit);
+      font-size: var(--global-type-size-16, 1.6rem);
+      line-height: var(--global-type-line-height-140pc, 1.4);
+    }
+
+    .--grid-sub p {
+      margin: 0;
+    }
+
+    /* ---- grid ---- */
+    .--pgrid {
+      display: grid;
+      grid-template-columns: repeat({{ columns }}, minmax(0, 1fr));
+      gap: {{ section.settings.grid_gap | append: 'px' }};
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    /* ---- card ---- */
+    .--pcard {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      text-align: left;
+      text-decoration: none;
+      color: inherit;
+      background: var(--fds-color-surface-default, #fff);
+      border: var(--fds-border-width-fine, 0.1rem) solid var(--fds-color-border-default, #dee0e3);
+      border-radius: var(--fds-radii-angled, 0);
+      {% if section.settings.hover_lift %}
+        transition: transform 0.18s var(--ease-out, ease-out), box-shadow 0.18s var(--ease-out, ease-out);
+      {% endif %}
+    }
+
+    {%- if section.settings.hover_lift %}
+      .--pcard:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--box-shadow-small, 0 4px 15px 0 rgba(0, 0, 0, 0.1));
+      }
+    {%- endif %}
+
+    .--pcard-thumb {
+      position: relative;
+      display: block;
+      aspect-ratio: {{ section.settings.image_ratio | default: '4 / 3' }};
+      background: var(--tint);
+      border-bottom: var(--fds-border-width-fine, 0.1rem) solid var(--fds-color-border-default, #dee0e3);
+      overflow: hidden;
+    }
+
+    .--pcard-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Blueprint crosshatch, tinted from the card's own accent. */
+    .--pcard-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size: {{ section.settings.grid_motif_size | append: 'px' }} {{ section.settings.grid_motif_size | append: 'px' }};
+    }
+
+    .--pcard-badge {
+      position: absolute;
+      top: 1.4rem;
+      right: 1.4rem;
+      padding: 0.3rem 0.8rem;
+      background: var(--hue);
+      color: var(--fds-color-text-inverse, #fff);
+      border-radius: var(--fds-radii-angled, 0);
+      font-family: var(--fds-type-meta-family, inherit);
+      font-size: 1.05rem;
+      font-weight: var(--global-type-weight-skandia-bold, 700);
+      line-height: 1.4;
+      text-transform: var(--global-type-case-upper, uppercase);
+      letter-spacing: 0.06em;
+    }
+
+    .--pcard-dim {
+      position: absolute;
+      left: 1.6rem;
+      bottom: 1.4rem;
+      padding: 0.3rem 0.8rem;
+      background: var(--fds-color-surface-default, #fff);
+      color: var(--hue);
+      border: var(--fds-border-width-fine, 0.1rem) solid var(--fds-color-border-default, #dee0e3);
+      border-radius: var(--fds-radii-angled, 0);
+      font-family: var(--fds-type-meta-family, inherit);
+      font-size: 1.1rem;
+      line-height: 1.4;
+    }
+
+    .--pcard-body {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      flex: 1 1 auto;
+      padding: 1.6rem 1.8rem 1.8rem;
+    }
+
+    .--pcard-title {
+      display: block;
+      font-family: var(--fds-type-heading-family, inherit);
+      font-weight: var(--fds-type-title-weight, 800);
+      font-size: {{ section.settings.card_title_size | append: 'px' }};
+      line-height: var(--fds-type-heading-leading, 0.94);
+      color: rgb(var(--color-foreground, 13, 16, 18));
+    }
+
+    .--pcard-desc {
+      display: block;
+      flex: 1 1 auto;
+      color: var(--fds-color-text-muted, #767a7f);
+      font-family: var(--fds-type-body-family, inherit);
+      font-size: var(--global-type-size-14, 1.4rem);
+      line-height: var(--global-type-line-height-140pc, 1.4);
+    }
+
+    .--pcard-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--global-spacing-8, 0.8rem);
+      margin-top: 0.8rem;
+      padding-top: 1.2rem;
+      border-top: var(--fds-border-width-fine, 0.1rem) solid var(--global-color-neutral-100, #f4f5f6);
+    }
+
+    .--pcard-from {
+      color: var(--fds-color-text-muted, #767a7f);
+      font-family: var(--fds-type-body-family, inherit);
+      font-size: var(--global-type-size-12, 1.2rem);
+    }
+
+    .--pcard-from b {
+      color: rgb(var(--color-foreground, 13, 16, 18));
+      font-family: var(--fds-type-title-family, inherit);
+      font-weight: var(--fds-type-title-weight, 800);
+      font-size: var(--global-type-size-16, 1.6rem);
+    }
+
+    .--pcard-go {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex: none;
+      color: var(--hue);
+      font-family: var(--fds-type-body-family, inherit);
+      font-size: var(--global-type-size-12, 1.2rem);
+      font-weight: var(--global-type-weight-skandia-bold, 700);
+      text-transform: var(--global-type-case-upper, uppercase);
+      letter-spacing: 0.06em;
+    }
+
+    .--pcard-go svg {
+      flex: none;
+      transition: transform var(--duration-default, 200ms) var(--ease-out, ease-out);
+    }
+
+    .--pcard:hover .--pcard-go svg {
+      transform: translateX(0.3rem);
+    }
+
+    .--grid-empty {
+      padding: var(--global-spacing-40, 4rem);
+      border: var(--fds-border-width-fine, 0.1rem) dashed var(--fds-color-border-default, #dee0e3);
+      color: var(--fds-color-text-muted, #767a7f);
+      text-align: center;
+      font-size: var(--global-type-size-14, 1.4rem);
+    }
+  }
+
+  @media screen and (max-width: 900px) {
+    .section-container--{{ section.id }} .--pgrid {
+      grid-template-columns: repeat({% if columns > 2 %}2{% else %}{{ columns }}{% endif %}, minmax(0, 1fr));
+    }
+  }
+
+  @media screen and (max-width: 560px) {
+    .section-container--{{ section.id }} .--pgrid {
+      grid-template-columns: 1fr;
+    }
+
+    .section-container--{{ section.id }} {
+      margin-top: {{ section.settings.margin_top_mobile | append: 'px' }};
+      margin-bottom: {{ section.settings.margin_bottom_mobile | append: 'px' }};
+      padding-top: {{ section.settings.padding_top_mobile | append: 'px' }};
+      padding-bottom: {{ section.settings.padding_bottom_mobile | append: 'px' }};
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .section-container--{{ section.id }} * {
+      transition-duration: 1ms !important;
+    }
+  }
+</style>
+
+<section
+  class="section-container--{{ section.id }} color-{{ section.settings.color_scheme }}"
+  id="{{ section.settings.navid | default: 'products' }}"
+>
+  <div class="section-wrapper--{{ section.id }}{% if section.settings.full_width != true %} page-width{% endif %}">
+    {%- if section.settings.heading != blank or section.settings.subheading != blank -%}
+      <div class="--grid-top">
+        {%- if section.settings.heading != blank -%}
+          <h2 class="--grid-heading">{{ section.settings.heading }}</h2>
+        {%- endif -%}
+        {%- if section.settings.subheading != blank -%}
+          <div class="--grid-sub">{{ section.settings.subheading }}</div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- if source == 'collection' -%}
+      {%- liquid
+        assign collection = collections[section.settings.collection]
+        assign limit = section.settings.products_to_show | default: 6
+      -%}
+
+      {%- if collection != blank and collection.products_count > 0 -%}
+        <ul class="--pgrid" role="list">
+          {%- for product in collection.products limit: limit -%}
+            {%- liquid
+              assign slot = forloop.index0 | modulo: palette.size
+              if section.settings.vary_accents
+                assign hue = palette[slot]
+                assign tint = tints[slot]
+              else
+                assign hue = section.settings.accent_color
+                assign tint = section.settings.tint_color
+              endif
+              assign line = hue | color_modify: 'alpha', 0.1
+
+              assign card_image = blank
+              if section.settings.show_images
+                assign card_image = product.featured_image
+              endif
+
+              assign badge = ''
+              assign dim = ''
+              assign unit = section.settings.price_unit
+              if ns != blank
+                if section.settings.metafield_badge != blank
+                  assign badge = product.metafields[ns][section.settings.metafield_badge].value
+                endif
+                if section.settings.metafield_dim != blank
+                  assign dim = product.metafields[ns][section.settings.metafield_dim].value
+                endif
+                if section.settings.metafield_unit != blank
+                  assign mf_unit = product.metafields[ns][section.settings.metafield_unit].value
+                  if mf_unit != blank
+                    assign unit = mf_unit
+                  endif
+                endif
+              endif
+
+              comment
+                Shopify does not allow filters on render arguments, so anything
+                filtered has to be resolved into a variable first.
+              endcomment
+              assign card_desc = product.description | strip_html | truncatewords: 16
+              assign card_price = product.price | money_without_trailing_zeros
+            -%}
+            <li>
+              {%- render 'custom-product-grid-card',
+                title: product.title,
+                url: product.url,
+                desc: card_desc,
+                image: card_image,
+                badge: badge,
+                dim: dim,
+                price: card_price,
+                prefix: section.settings.price_prefix,
+                unit: unit,
+                cta: section.settings.cta_label,
+                hue: hue,
+                tint: tint,
+                line: line
+              -%}
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- else -%}
+        <p class="--grid-empty">
+          {{- 'sections.collection_template.empty' | t -}}
+        </p>
+      {%- endif -%}
+
+    {%- elsif cards.size > 0 -%}
+      <ul class="--pgrid" role="list">
+        {%- for block in cards -%}
+          {%- liquid
+            assign slot = forloop.index0 | modulo: palette.size
+            assign hue = block.settings.accent_color
+            if hue == blank
+              if section.settings.vary_accents
+                assign hue = palette[slot]
+              else
+                assign hue = section.settings.accent_color
+              endif
+            endif
+            assign tint = block.settings.tint_color
+            if tint == blank
+              if section.settings.vary_accents
+                assign tint = tints[slot]
+              else
+                assign tint = section.settings.tint_color
+              endif
+            endif
+            assign line = hue | color_modify: 'alpha', 0.1
+            assign card_url = block.settings.link | default: routes.all_products_collection_url
+          -%}
+          <li>
+            {%- render 'custom-product-grid-card',
+              title: block.settings.title,
+              url: card_url,
+              desc: block.settings.desc,
+              image: block.settings.image,
+              badge: block.settings.badge,
+              dim: block.settings.dim,
+              price: block.settings.price,
+              prefix: section.settings.price_prefix,
+              unit: block.settings.unit,
+              cta: section.settings.cta_label,
+              hue: hue,
+              tint: tint,
+              line: line,
+              attrs: block.shopify_attributes
+            -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Custom Product Grid",
+  "tag": "div",
+  "class": "custom-product-grid-section",
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full Width Section",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "navid",
+      "label": "Id(for navigation)",
+      "default": "products"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Custom pricing on every product"
+    },
+    {
+      "type": "richtext",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "<p>Each product is priced by its own calculator. Open any one to build your price.</p>"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "min": 20,
+      "max": 64,
+      "step": 1,
+      "unit": "px",
+      "label": "Heading max size",
+      "default": 32
+    },
+    {
+      "type": "checkbox",
+      "id": "uppercase_heading",
+      "label": "Uppercase heading",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "header_alignment",
+      "label": "Heading alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "header_gap",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Space below heading",
+      "default": 28
+    },
+    {
+      "type": "header",
+      "content": "Source"
+    },
+    {
+      "type": "select",
+      "id": "source",
+      "label": "Cards come from",
+      "options": [
+        { "value": "collection", "label": "A collection" },
+        { "value": "blocks", "label": "Manual cards" }
+      ],
+      "default": "collection"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "label": "Products to show",
+      "default": 6
+    },
+    {
+      "type": "checkbox",
+      "id": "show_images",
+      "label": "Use product images",
+      "default": true,
+      "info": "When off — or when a product has no image — the blueprint grid motif is drawn instead."
+    },
+    {
+      "type": "header",
+      "content": "Product metafields"
+    },
+    {
+      "type": "paragraph",
+      "content": "Optional. Reads the badge, dimension chip and price unit from product metafields. Any left empty is simply omitted from the card."
+    },
+    {
+      "type": "text",
+      "id": "metafield_namespace",
+      "label": "Namespace",
+      "default": "custom"
+    },
+    {
+      "type": "text",
+      "id": "metafield_badge",
+      "label": "Badge key"
+    },
+    {
+      "type": "text",
+      "id": "metafield_dim",
+      "label": "Dimension key"
+    },
+    {
+      "type": "text",
+      "id": "metafield_unit",
+      "label": "Price unit key"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "label": "Columns",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Grid gap",
+      "default": 22
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Thumbnail ratio",
+      "options": [
+        { "value": "4 / 3", "label": "4:3" },
+        { "value": "1 / 1", "label": "Square" },
+        { "value": "3 / 4", "label": "Portrait" },
+        { "value": "16 / 9", "label": "16:9" }
+      ],
+      "default": "4 / 3"
+    },
+    {
+      "type": "range",
+      "id": "card_title_size",
+      "min": 14,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "label": "Card title size",
+      "default": 17
+    },
+    {
+      "type": "range",
+      "id": "grid_motif_size",
+      "min": 10,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "label": "Blueprint grid size",
+      "default": 22
+    },
+    {
+      "type": "checkbox",
+      "id": "hover_lift",
+      "label": "Lift cards on hover",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Card copy"
+    },
+    {
+      "type": "text",
+      "id": "price_prefix",
+      "label": "Price prefix",
+      "default": "from"
+    },
+    {
+      "type": "text",
+      "id": "price_unit",
+      "label": "Default price unit",
+      "default": "m²",
+      "info": "Used when no metafield unit is set."
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Call to action",
+      "default": "Build price"
+    },
+    {
+      "type": "header",
+      "content": "Accents"
+    },
+    {
+      "type": "checkbox",
+      "id": "vary_accents",
+      "label": "Vary accents",
+      "default": true,
+      "info": "Cycles a five-colour palette by card position, as in the demo store."
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "#004EBA",
+      "info": "Used for every card when Vary accents is off."
+    },
+    {
+      "type": "color",
+      "id": "tint_color",
+      "label": "Thumbnail tint",
+      "default": "#EDF4FC"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "info": "Overrides the color scheme when set."
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color"
+    },
+    {
+      "type": "header",
+      "content": "Desktop Spacing"
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Bottom",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 64
+    },
+    {
+      "type": "header",
+      "content": "Mobile Spacing"
+    },
+    {
+      "type": "range",
+      "id": "margin_top_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Top (Mobile)",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Bottom (Mobile)",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Top (Mobile)",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Bottom (Mobile)",
+      "default": 40
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Card",
+      "type": "card",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Roller Blinds"
+        },
+        {
+          "type": "text",
+          "id": "desc",
+          "label": "Description",
+          "default": "Cut to your recess. Optional motorised control."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "Leave empty to draw the blueprint grid motif."
+        },
+        {
+          "type": "text",
+          "id": "badge",
+          "label": "Badge",
+          "default": "Area pricing"
+        },
+        {
+          "type": "text",
+          "id": "dim",
+          "label": "Dimension chip",
+          "default": "W × H"
+        },
+        {
+          "type": "text",
+          "id": "price",
+          "label": "Price",
+          "default": "$85"
+        },
+        {
+          "type": "text",
+          "id": "unit",
+          "label": "Price unit",
+          "default": "m²"
+        },
+        {
+          "type": "color",
+          "id": "accent_color",
+          "label": "Accent color",
+          "info": "Leave empty to take the cycled palette colour."
+        },
+        {
+          "type": "color",
+          "id": "tint_color",
+          "label": "Thumbnail tint"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Product Grid",
+      "category": "Custom Sections"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,511 @@
+{% comment %}
+  Custom steps strip.
+
+  Structure follows sections/base.liquid: a scoped style block keyed on
+  section.id, a .section-container--{{ section.id }} wrapper carrying the
+  spacing settings, a .section-wrapper--{{ section.id }} inner, then the schema.
+
+  Layout and content follow the strip below the hero in
+  made-and-measured-demo-store.html: a full-bleed band with hairline rules top
+  and bottom, and equal columns separated by lighter vertical dividers. The
+  band spans the viewport while the steps stay inside the page grid, which is
+  exactly what the container/wrapper split in base.liquid gives.
+
+  No JavaScript — static markup and CSS.
+{% endcomment %}
+
+{%- liquid
+  assign accent = section.settings.accent_color | default: '#004EBA'
+  assign columns = section.settings.columns | default: 3
+  assign auto_number = section.settings.auto_number
+  assign steps = section.blocks | where: 'type', 'step'
+-%}
+
+<style>
+  .section-container--{{ section.id }} {
+    --step-accent: {{ accent }};
+    --step-pad-y: {{ section.settings.step_padding_y | append: 'px' }};
+    --step-pad-x: {{ section.settings.step_padding_x | append: 'px' }};
+    margin-top: {{ section.settings.margin_top | append: 'px' }};
+    margin-bottom: {{ section.settings.margin_bottom | append: 'px' }};
+    padding-top: {{ section.settings.padding_top | append: 'px' }};
+    padding-bottom: {{ section.settings.padding_bottom | append: 'px' }};
+    {% if section.settings.bg_color != blank %}background: {{ section.settings.bg_color }};{% endif %}
+    {% if section.settings.text_color != blank %}color: {{ section.settings.text_color }};{% endif %}
+    {% if section.settings.show_top_border %}
+      border-top: var(--fds-border-width-fine, 0.1rem) solid var(--fds-color-border-default, #dee0e3);
+    {% endif %}
+    {% if section.settings.show_bottom_border %}
+      border-bottom: var(--fds-border-width-fine, 0.1rem) solid var(--fds-color-border-default, #dee0e3);
+    {% endif %}
+  }
+
+  .section-wrapper--{{ section.id }} {
+    display: grid;
+    grid-template-columns: repeat({{ columns }}, minmax(0, 1fr));
+    margin-block: 0;
+    padding-block: 0;
+    list-style: none;
+  }
+
+  .section-container--{{ section.id }} {
+    .--step {
+      list-style: none;
+      min-width: 0;
+      padding: var(--step-pad-y) var(--step-pad-x);
+      text-align: {{ section.settings.alignment | default: 'left' }};
+    }
+
+    {%- if section.settings.show_dividers %}
+      /* Dividers are a lighter rule than the band's own edges, so the strip
+         reads as one band subdivided rather than as separate cards. */
+      .--step + .--step {
+        border-left: var(--fds-border-width-fine, 0.1rem) solid var(--global-color-neutral-100, #f4f5f6);
+      }
+    {%- endif %}
+
+    /* Outer padding is dropped on the first and last cell so the copy lines up
+       with the page grid instead of sitting inset from it. */
+    .--step:first-child {
+      padding-inline-start: 0;
+    }
+
+    .--step:last-child {
+      padding-inline-end: 0;
+    }
+
+    .--step-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 4rem;
+      height: 4rem;
+      margin-bottom: var(--global-spacing-16, 1.6rem);
+      border: var(--fds-border-width-fine, 0.1rem) solid var(--fds-color-border-default, #dee0e3);
+      border-radius: var(--fds-radii-angled, 0);
+      color: var(--step-accent);
+    }
+
+    .--step-number {
+      display: block;
+      margin-bottom: 1rem;
+      color: var(--step-accent);
+      font-family: var(--fds-type-meta-family, inherit);
+      font-size: var(--fds-type-meta-size, 1.2rem);
+      font-weight: var(--global-type-weight-skandia-bold, 700);
+      line-height: 1;
+      letter-spacing: 0.08em;
+    }
+
+    .--step-title {
+      margin: 0 0 0.6rem;
+      color: rgb(var(--color-foreground, 13, 16, 18));
+      font-family: var(--fds-type-heading-family, inherit);
+      font-weight: var(--fds-type-title-weight, 800);
+      font-size: {{ section.settings.title_size | append: 'px' }};
+      line-height: var(--fds-type-heading-leading, 0.94);
+      letter-spacing: var(--global-type-letterspacing-0pc, 0);
+      {% if section.settings.uppercase_title %}text-transform: var(--global-type-case-upper, uppercase);{% endif %}
+    }
+
+    .--step-text {
+      color: var(--fds-color-text-muted, #767a7f);
+      font-family: var(--fds-type-body-family, inherit);
+      font-size: var(--global-type-size-14, 1.4rem);
+      line-height: var(--global-type-line-height-140pc, 1.4);
+    }
+
+    .--step-text p {
+      margin: 0 0 0.8rem;
+    }
+
+    .--step-text p:last-child {
+      margin-bottom: 0;
+    }
+
+    .--step-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-top: var(--global-spacing-16, 1.6rem);
+      color: var(--step-accent);
+      text-decoration: none;
+      font-family: var(--fds-type-body-family, inherit);
+      font-size: var(--global-type-size-12, 1.2rem);
+      font-weight: var(--global-type-weight-skandia-bold, 700);
+      text-transform: var(--global-type-case-upper, uppercase);
+      letter-spacing: 0.08em;
+    }
+
+    .--step-link svg {
+      flex: none;
+      transition: transform var(--duration-default, 200ms) var(--ease-out, ease-out);
+    }
+
+    .--step-link:hover svg {
+      transform: translateX(0.3rem);
+    }
+
+    .--step-link:hover span {
+      text-decoration: underline;
+      text-underline-offset: 0.3em;
+    }
+  }
+
+  @media screen and (max-width: 760px) {
+    .section-wrapper--{{ section.id }} {
+      grid-template-columns: 1fr;
+    }
+
+    .section-container--{{ section.id }} {
+      margin-top: {{ section.settings.margin_top_mobile | append: 'px' }};
+      margin-bottom: {{ section.settings.margin_bottom_mobile | append: 'px' }};
+      padding-top: {{ section.settings.padding_top_mobile | append: 'px' }};
+      padding-bottom: {{ section.settings.padding_bottom_mobile | append: 'px' }};
+    }
+
+    .section-container--{{ section.id }} .--step {
+      padding-inline: 0;
+    }
+
+    {%- if section.settings.show_dividers %}
+      /* One column: the divider has to become a horizontal rule, or it would
+         hang off the right edge of every step. */
+      .section-container--{{ section.id }} .--step + .--step {
+        border-left: 0;
+        border-top: var(--fds-border-width-fine, 0.1rem) solid var(--global-color-neutral-100, #f4f5f6);
+      }
+    {%- endif %}
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .section-container--{{ section.id }} * {
+      transition-duration: 1ms !important;
+    }
+  }
+</style>
+
+{%- if steps.size > 0 -%}
+  <section
+    class="section-container--{{ section.id }} color-{{ section.settings.color_scheme }}"
+    id="{{ section.settings.navid | default: 'steps' }}"
+  >
+    <ol
+      class="section-wrapper--{{ section.id }}{% if section.settings.full_width != true %} page-width{% endif %}"
+      role="list"
+    >
+      {%- for block in steps -%}
+        {%- render 'custom-step-item', block: block, position: forloop.index, auto: auto_number -%}
+      {%- endfor -%}
+    </ol>
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Custom Steps",
+  "tag": "div",
+  "class": "custom-steps-section",
+  "max_blocks": 6,
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full Width Section",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "navid",
+      "label": "Id(for navigation)",
+      "default": "steps"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "#004EBA",
+      "info": "Used by the step numbers, icons and links."
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "label": "Columns",
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Text alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dividers",
+      "label": "Show dividers between steps",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_top_border",
+      "label": "Show top border",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_bottom_border",
+      "label": "Show bottom border",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "step_padding_y",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Step padding — vertical",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "step_padding_x",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Step padding — horizontal",
+      "default": 28
+    },
+    {
+      "type": "header",
+      "content": "Type"
+    },
+    {
+      "type": "checkbox",
+      "id": "auto_number",
+      "label": "Number steps automatically",
+      "default": true,
+      "info": "Generates 01, 02, 03… and ignores the number set on each step."
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 12,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Title size",
+      "default": 17
+    },
+    {
+      "type": "checkbox",
+      "id": "uppercase_title",
+      "label": "Uppercase titles",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "info": "Overrides the color scheme when set."
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color"
+    },
+    {
+      "type": "header",
+      "content": "Desktop Spacing"
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Bottom",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Mobile Spacing"
+    },
+    {
+      "type": "range",
+      "id": "margin_top_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Top (Mobile)",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Bottom (Mobile)",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Top (Mobile)",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Bottom (Mobile)",
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Step",
+      "type": "step",
+      "settings": [
+        {
+          "type": "text",
+          "id": "number",
+          "label": "Number",
+          "info": "Ignored while automatic numbering is on."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Enter your size"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Type your width and height, or the area you need — every field is range-checked.</p>"
+        },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "none", "label": "None" },
+            { "value": "corners", "label": "Size" },
+            { "value": "sliders", "label": "Options" },
+            { "value": "currency", "label": "Price" },
+            { "value": "bag", "label": "Cart" },
+            { "value": "ruler", "label": "Ruler" },
+            { "value": "spark", "label": "Spark" },
+            { "value": "check", "label": "Check" }
+          ],
+          "default": "none"
+        },
+        {
+          "type": "text",
+          "id": "link_label",
+          "label": "Link label",
+          "info": "Leave empty to hide the link."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Steps",
+      "category": "Custom Sections",
+      "blocks": [
+        {
+          "type": "step",
+          "settings": {
+            "title": "Enter your size",
+            "text": "<p>Type your width and height, or the area you need — every field is range-checked.</p>"
+          }
+        },
+        {
+          "type": "step",
+          "settings": {
+            "title": "Choose your options",
+            "text": "<p>Material, thickness, finish, add-ons — each one adjusts the price as you go.</p>"
+          }
+        },
+        {
+          "type": "step",
+          "settings": {
+            "title": "Price builds live",
+            "text": "<p>The total updates instantly and carries to cart with your exact spec attached.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

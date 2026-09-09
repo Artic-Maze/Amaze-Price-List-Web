@@ -1,0 +1,135 @@
+{% comment %}
+  Renders the hero visual — the orbit from made-and-measured-demo-store.html.
+
+  A dashed ring carries the process steps as orbit nodes, with a mock app
+  window at the centre. Node angles are computed here and handed to CSS as
+  --angle, so the ring stays evenly spaced for any number of nodes rather
+  than being locked to the demo's four fixed positions.
+
+  If an image is set on the section it replaces the whole mock, since a
+  merchant will usually want a real screenshot eventually.
+
+  The ring, dot grids, sparks and the app window are decorative and hidden
+  from assistive tech. The node labels are NOT — they describe the process,
+  so they are exposed as a real list.
+
+  Markup only; styling lives in sections/custom-hero.liquid.
+
+  Accepts:
+  - section: {Object} the hero section (required)
+
+  Usage:
+  {% render 'custom-hero-visual', section: section %}
+{% endcomment %}
+
+{%- liquid
+  assign nodes = section.blocks | where: 'type', 'orbit_node'
+  assign rows = section.blocks | where: 'type', 'spec_row'
+  assign node_count = nodes.size
+-%}
+
+<div class="--hero-visual">
+  {%- if section.settings.visual_image != blank -%}
+    {{
+      section.settings.visual_image
+      | image_url: width: 1200
+      | image_tag:
+        class: '--hero-image',
+        widths: '400, 600, 800, 1000, 1200',
+        sizes: '(min-width: 940px) 47vw, 90vw',
+        loading: 'eager',
+        fetchpriority: 'high'
+    }}
+  {%- else -%}
+    <div class="--orbit">
+      {%- if section.settings.show_ring -%}
+        <span class="--orbit-ring" aria-hidden="true"></span>
+      {%- endif -%}
+
+      {%- if section.settings.show_dots -%}
+        <span class="--orbit-dots --at-tr" aria-hidden="true"></span>
+        <span class="--orbit-dots --at-bl" aria-hidden="true"></span>
+      {%- endif -%}
+
+      {%- if section.settings.show_sparks -%}
+        <span class="--orbit-spark --at-1" aria-hidden="true">+</span>
+        <span class="--orbit-spark --at-2" aria-hidden="true">+</span>
+      {%- endif -%}
+
+      {%- if node_count > 0 -%}
+        <ul class="--orbit-nodes" role="list">
+          {%- for block in nodes -%}
+            {%- liquid
+              assign angle = forloop.index0 | times: 360 | divided_by: node_count
+            -%}
+            <li
+              class="--orbit-node"
+              style="--angle: {{ angle }}deg;"
+              {{ block.shopify_attributes }}
+            >
+              <span class="--orbit-node-icon" aria-hidden="true">
+                {%- render 'custom-icons', name: block.settings.icon, size: 18 -%}
+              </span>
+              <span class="--orbit-node-label">{{ block.settings.label | escape }}</span>
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+
+      {%- comment -%}
+        Decorative product mock. Hidden from assistive tech: the same figures
+        are only meaningful as an illustration of the calculator.
+      {%- endcomment -%}
+      <div class="--appwin" aria-hidden="true">
+        <div class="--aw-side">
+          <div class="--aw-brand">
+            <span class="--aw-logo">{{ section.settings.mock_brand | slice: 0 }}</span>
+            <span>{{ section.settings.mock_brand }}</span>
+          </div>
+
+          {%- if section.settings.mock_nav != blank -%}
+            <div class="--aw-nav">
+              {%- assign nav_items = section.settings.mock_nav | split: ',' -%}
+              {%- for item in nav_items -%}
+                <span class="--aw-item{% if forloop.index == section.settings.mock_nav_active %} is-on{% endif %}">
+                  {{- item | strip -}}
+                </span>
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+        </div>
+
+        <div class="--aw-main">
+          <div class="--aw-top">
+            <span>{{ section.settings.mock_section_label }}</span>
+            <span class="--aw-add">{{ section.settings.mock_action_label }}</span>
+          </div>
+
+          <div class="--aw-card">
+            {%- if section.settings.mock_title != blank -%}
+              <div class="--awc-title">{{ section.settings.mock_title }}</div>
+            {%- endif -%}
+
+            {%- for block in rows -%}
+              <div class="--awc-row" {{ block.shopify_attributes }}>
+                <span>{{ block.settings.label }}</span>
+                <b>{{ block.settings.value }}</b>
+              </div>
+            {%- endfor -%}
+
+            {%- if section.settings.mock_total_value != blank -%}
+              <div class="--awc-total">
+                <span>{{ section.settings.mock_total_label }}</span>
+                <b>{{ section.settings.mock_total_value }}</b>
+              </div>
+            {%- endif -%}
+
+            {%- if section.settings.mock_button != blank -%}
+              <div class="--awc-btn">{{ section.settings.mock_button }}</div>
+            {%- endif -%}
+          </div>
+        </div>
+      </div>
+    </div>
+  {%- endif -%}
+</div>
