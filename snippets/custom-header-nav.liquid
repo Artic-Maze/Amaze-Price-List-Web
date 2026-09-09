@@ -1,0 +1,112 @@
+{% comment %}
+  Renders the desktop navigation for the custom header.
+
+  Uses <details>/<summary> disclosures so submenus are operable by keyboard and
+  usable before JS runs; the <header-nav> custom element in
+  assets/custom-header.js layers hover-intent and Escape-to-close on top.
+
+  Markup only; styling lives in sections/custom-header.liquid.
+
+  Accepts:
+  - section: {Object} the header section (required)
+
+  Usage:
+  {% render 'custom-header-nav', section: section %}
+{% endcomment %}
+
+{%- liquid
+  assign menu = section.settings.menu
+  assign menu_type = section.settings.menu_type | default: 'dropdown'
+  assign highlights = ''
+  for block in section.blocks
+    if block.type == 'highlight'
+      assign highlights = highlights | append: block.settings.link_title | append: '|'
+    endif
+  endfor
+-%}
+
+{%- if menu != blank and menu.links.size > 0 -%}
+  <header-nav class="--header-nav" data-menu-type="{{ menu_type }}">
+    <nav aria-label="{{ 'sections.header.menu' | t }}">
+      <ul class="--nav-list" role="list">
+        {%- for link in menu.links -%}
+          {%- liquid
+            assign is_highlight = false
+            assign needle = link.title | append: '|'
+            if highlights contains needle
+              assign is_highlight = true
+            endif
+          -%}
+
+          {%- if link.links.size > 0 -%}
+            <li class="--nav-item --nav-item--has-children">
+              <details
+                class="--nav-details"
+                data-nav-details
+                id="nav-{{ link.handle }}-{{ section.id }}"
+              >
+                <summary
+                  class="--nav-link{% if link.active or link.child_active %} is-active{% endif %}{% if is_highlight %} is-highlight{% endif %}"
+                  aria-haspopup="true"
+                >
+                  <span>{{ link.title | escape }}</span>
+                  {%- render 'custom-icons', name: 'chevron-down', size: 14, class: '--nav-caret' -%}
+                </summary>
+
+                <div class="--nav-panel --nav-panel--{{ menu_type }}">
+                  <div class="--nav-panel-inner{% if menu_type == 'mega' %} page-width{% endif %}">
+                    <ul class="--nav-sublist" role="list">
+                      {%- for child in link.links -%}
+                        <li class="--nav-subitem">
+                          <a
+                            class="--nav-sublink{% if child.active %} is-active{% endif %}"
+                            href="{{ child.url }}"
+                            {% if child.current %}
+                              aria-current="page"
+                            {% endif %}
+                          >
+                            {{ child.title | escape }}
+                          </a>
+
+                          {%- if menu_type == 'mega' and child.links.size > 0 -%}
+                            <ul class="--nav-grandlist" role="list">
+                              {%- for grandchild in child.links -%}
+                                <li>
+                                  <a
+                                    class="--nav-grandlink{% if grandchild.active %} is-active{% endif %}"
+                                    href="{{ grandchild.url }}"
+                                    {% if grandchild.current %}
+                                      aria-current="page"
+                                    {% endif %}
+                                  >
+                                    {{ grandchild.title | escape }}
+                                  </a>
+                                </li>
+                              {%- endfor -%}
+                            </ul>
+                          {%- endif -%}
+                        </li>
+                      {%- endfor -%}
+                    </ul>
+                  </div>
+                </div>
+              </details>
+            </li>
+          {%- else -%}
+            <li class="--nav-item">
+              <a
+                class="--nav-link{% if link.active %} is-active{% endif %}{% if is_highlight %} is-highlight{% endif %}"
+                href="{{ link.url }}"
+                {% if link.current %}
+                  aria-current="page"
+                {% endif %}
+              >
+                <span>{{ link.title | escape }}</span>
+              </a>
+            </li>
+          {%- endif -%}
+        {%- endfor -%}
+      </ul>
+    </nav>
+  </header-nav>
+{%- endif -%}

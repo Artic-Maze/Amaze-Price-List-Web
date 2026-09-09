@@ -1,0 +1,104 @@
+{% comment %}
+  Renders a single icon from the custom icon set.
+
+  Follows the {% case name %} pattern of snippets/all-icons.liquid, but every
+  glyph here is stroke-based on `currentColor` so it inherits the surrounding
+  text colour and the Gymshark line weight (--fds-border-width-regular).
+
+  Accepts:
+  - name:   {String} icon key (required)
+  - size:   {Number} px width/height. Default: 20
+  - width:  {Number} px width, overrides size
+  - height: {Number} px height, overrides size
+  - class:  {String} extra class names
+  - stroke: {Number} stroke width. Default: 1.6
+
+  Usage:
+  {% render 'custom-icons', name: 'bag', size: 22 %}
+{% endcomment %}
+
+{%- liquid
+  assign icon_size = size | default: 20
+  assign icon_w = width | default: icon_size
+  assign icon_h = height | default: icon_size
+  assign icon_stroke = stroke | default: 1.6
+  assign icon_class = class | default: ''
+-%}
+
+{%- capture svg_open -%}
+  width="{{ icon_w }}" height="{{ icon_h }}" viewBox="0 0 24 24" fill="none"
+  stroke="currentColor" stroke-width="{{ icon_stroke }}" stroke-linecap="round"
+  stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" focusable="false"
+  aria-hidden="true" class="--icon --icon-{{ name }} {{ icon_class }}"
+{%- endcapture -%}
+
+{%- case name -%}
+  {%- when 'search' -%}
+    <svg {{ svg_open }}><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+
+  {%- when 'account' -%}
+    <svg {{ svg_open }}><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>
+
+  {%- when 'bag' -%}
+    <svg {{ svg_open }}><path d="M5 7h14l1 14H4L5 7Z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg>
+
+  {%- when 'heart' -%}
+    <svg {{ svg_open }}><path d="M12 20s-7-4.5-7-9.5A4.5 4.5 0 0 1 12 7a4.5 4.5 0 0 1 7 3.5c0 5-7 9.5-7 9.5Z"/></svg>
+
+  {%- when 'menu' -%}
+    <svg {{ svg_open }}><path d="M3 6h18"/><path d="M3 12h18"/><path d="M3 18h18"/></svg>
+
+  {%- when 'close' -%}
+    <svg {{ svg_open }}><path d="M6 6l12 12"/><path d="M18 6 6 18"/></svg>
+
+  {%- when 'chevron-down' -%}
+    <svg {{ svg_open }}><path d="m6 9 6 6 6-6"/></svg>
+
+  {%- when 'chevron-right' -%}
+    <svg {{ svg_open }}><path d="m9 6 6 6-6 6"/></svg>
+
+  {%- when 'chevron-left' -%}
+    <svg {{ svg_open }}><path d="m15 6-6 6 6 6"/></svg>
+
+  {%- when 'arrow-right' -%}
+    <svg {{ svg_open }}><path d="M4 12h16"/><path d="m14 6 6 6-6 6"/></svg>
+
+  {%- when 'truck' -%}
+    <svg {{ svg_open }}><path d="M2 7h11v10H2z"/><path d="M13 10h5l3 3v4h-8z"/><circle cx="6" cy="19" r="1.6"/><circle cx="17" cy="19" r="1.6"/></svg>
+
+  {%- when 'return' -%}
+    <svg {{ svg_open }}><path d="M4 10h11a4.5 4.5 0 0 1 0 9H8"/><path d="m8 6-4 4 4 4"/></svg>
+
+  {%- when 'check' -%}
+    <svg {{ svg_open }}><path d="M20 6 9 17l-5-5"/></svg>
+
+  {%- when 'star' -%}
+    <svg {{ svg_open }}><path d="m12 3 2.7 5.7 6.3.8-4.6 4.3 1.2 6.2L12 17l-5.6 3 1.2-6.2L3 9.5l6.3-.8L12 3Z"/></svg>
+
+  {%- when 'globe' -%}
+    <svg {{ svg_open }}><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.5 2.4 2.5 15.6 0 18-2.5-2.4-2.5-15.6 0-18Z"/></svg>
+
+  {%- when 'spark' -%}
+    <svg {{ svg_open }}><path d="M12 3v6"/><path d="M12 15v6"/><path d="M3 12h6"/><path d="M15 12h6"/></svg>
+
+  {%- when 'ruler' -%}
+    <svg {{ svg_open }}><path d="M3 8h18v8H3z"/><path d="M7 8v3"/><path d="M11 8v3"/><path d="M15 8v3"/><path d="M19 8v3"/></svg>
+
+  {%- when 'corners' -%}
+    <svg {{ svg_open }}><path d="M3 8V3h5"/><path d="M21 8V3h-5"/><path d="M3 16v5h5"/><path d="M21 16v5h-5"/></svg>
+
+  {%- when 'sliders' -%}
+    <svg {{ svg_open }}><line x1="4" y1="8" x2="20" y2="8"/><circle cx="9" cy="8" r="2" fill="currentColor"/><line x1="4" y1="16" x2="20" y2="16"/><circle cx="15" cy="16" r="2" fill="currentColor"/></svg>
+
+  {%- when 'currency' -%}
+    <svg {{ svg_open }}><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+
+  {%- when 'pause' -%}
+    <svg {{ svg_open }}><path d="M9 5v14"/><path d="M15 5v14"/></svg>
+
+  {%- when 'play' -%}
+    <svg {{ svg_open }}><path d="M7 4.5v15l12-7.5-12-7.5Z"/></svg>
+
+  {%- when 'tag' -%}
+    <svg {{ svg_open }}><path d="M20 12l-8 8-9-9V3h8l9 9Z"/><circle cx="7.5" cy="7.5" r="1.2"/></svg>
+{%- endcase -%}

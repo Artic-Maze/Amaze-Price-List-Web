@@ -1,0 +1,1169 @@
+{% comment %}
+  Custom header.
+
+  Structure follows sections/base.liquid: a scoped style block keyed on
+  section.id, a .section-container--{{ section.id }} wrapper carrying the
+  spacing settings, a .section-wrapper--{{ section.id }} inner, then the schema.
+
+  Layout and lockup follow made-and-measured-demo-store.html: one flex bar of
+  fixed height, a square logo mark beside the wordmark, navigation sitting
+  directly beside the logo, and the actions pushed to the right edge.
+
+  Markup is split into snippets/custom-header-*.liquid. Behaviour lives in
+  assets/custom-header.js as the <sticky-header>, <header-nav>, <header-drawer>
+  custom elements.
+{% endcomment %}
+
+<script src="{{ 'custom-header.js' | asset_url }}" defer="defer"></script>
+
+{%- liquid
+  assign layout = section.settings.header_layout | default: 'logo-nav-actions'
+  assign sticky = section.settings.sticky_header_type | default: 'on-scroll-up'
+  assign is_transparent = section.settings.transparent
+  assign bp = section.settings.mobile_breakpoint | default: 820
+  assign accent = section.settings.mark_accent | default: '#004EBA'
+-%}
+
+<style>
+  /* sticky-header is a custom element: it defaults to display:inline, which
+     would make the JS height reservation (the anti-jump spacer) a no-op. */
+  sticky-header {
+    display: block;
+  }
+
+  .section-container--{{ section.id }} {
+    --bar-height: {{ section.settings.bar_height | append: 'px' }};
+    --header-logo-w: {{ section.settings.logo_width | append: 'px' }};
+    --header-gap: {{ section.settings.bar_gap | append: 'px' }};
+    --mark-accent: {{ accent }};
+    margin-top: {{ section.settings.margin_top | append: 'px' }};
+    margin-bottom: {{ section.settings.margin_bottom | append: 'px' }};
+    padding-top: {{ section.settings.padding_top | append: 'px' }};
+    padding-bottom: {{ section.settings.padding_bottom | append: 'px' }};
+    {% if section.settings.bg_color != blank %}background: {{ section.settings.bg_color }};{% endif %}
+    {% if section.settings.text_color != blank %}color: {{ section.settings.text_color }};{% endif %}
+    {% if section.settings.show_border %}
+      border-bottom: var(--fds-border-width-fine, 0.1rem) solid var(--fds-color-border-default, #dee0e3);
+    {% endif %}
+    position: relative;
+    z-index: 20;
+  }
+
+  {%- if is_transparent %}
+    .section-container--{{ section.id }}.--is-transparent {
+      position: absolute;
+      inset: 0 0 auto;
+      background: transparent;
+      border-bottom-color: transparent;
+      color: var(--fds-color-text-inverse, #fff);
+    }
+  {%- endif %}
+
+  /* The demo store's header is a single flex bar of fixed height, not a grid:
+     logo, then nav, then a gap that pushes the actions to the right edge. */
+  .section-wrapper--{{ section.id }} {
+    display: flex;
+    align-items: center;
+    gap: var(--header-gap);
+    min-height: var(--bar-height);
+  }
+
+  .section-container--{{ section.id }} {
+    .--header-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.9rem;
+      flex: none;
+      margin: 0;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* Measurement motif: a bordered square notched with an accent square. */
+    .--logo-mark {
+      position: relative;
+      flex: none;
+      width: 2.2rem;
+      height: 2.2rem;
+      border: var(--fds-border-width-regular, 0.2rem) solid currentColor;
+      border-radius: var(--fds-radii-angled, 0);
+    }
+
+    .--logo-mark::after {
+      content: '';
+      position: absolute;
+      inset: 0.4rem 0.4rem auto auto;
+      width: 0.8rem;
+      height: 0.8rem;
+      background: var(--mark-accent);
+    }
+
+    .--header-logo-image {
+      width: var(--header-logo-w);
+      height: auto;
+      display: block;
+    }
+
+    .--header-logo-text {
+      font-family: var(--fds-type-title-family, inherit);
+      font-weight: var(--fds-type-title-weight, 800);
+      font-size: {{ section.settings.logo_text_size | append: 'px' }};
+      line-height: 1;
+      letter-spacing: var(--global-type-letterspacing-0pc, 0);
+      {% if section.settings.uppercase_logo %}text-transform: var(--global-type-case-upper, uppercase);{% endif %}
+      white-space: nowrap;
+    }
+
+    /* ---- desktop nav ---- */
+    .--header-nav {
+      min-width: 0;
+      {%- case layout -%}
+        {%- when 'logo-nav-center' -%}
+          flex: 1 1 auto;
+          display: flex;
+          justify-content: center;
+        {%- when 'nav-logo-actions' -%}
+          flex: 1 1 0;
+        {%- else -%}
+          flex: 0 1 auto;
+      {%- endcase %}
+    }
+
+    .--nav-list {
+      display: flex;
+      align-items: center;
+      gap: var(--global-spacing-20, 2rem);
+      margin: 0;
+      padding: 0;
+    }
+
+    .--nav-item {
+      list-style: none;
+      position: relative;
+    }
+
+    /* Demo treatment: muted by default, darkening to full contrast on hover
+       and for the active item. No sliding underline. */
+    .--nav-link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--global-spacing-4, 0.4rem);
+      padding: var(--global-spacing-8, 0.8rem) 0;
+      color: var(--fds-color-text-muted, #767a7f);
+      text-decoration: none;
+      cursor: pointer;
+      list-style: none;
+      white-space: nowrap;
+      font-family: var(--fds-type-body-family, inherit);
+      font-size: {{ section.settings.nav_size | append: 'px' }};
+      font-weight: {% if section.settings.uppercase_nav %}var(--global-type-weight-skandia-bold, 700){% else %}var(--global-type-weight-medium, 500){% endif %};
+      line-height: var(--global-type-line-height-140pc, 1.4);
+      {% if section.settings.uppercase_nav %}
+        text-transform: var(--global-type-case-upper, uppercase);
+        letter-spacing: 0.06em;
+      {% endif %}
+      transition: color var(--duration-default, 200ms) var(--ease-out, ease-out);
+    }
+
+    .--nav-link::-webkit-details-marker {
+      display: none;
+    }
+
+    .--nav-link:hover,
+    .--nav-link.is-active,
+    .--nav-details[open] > .--nav-link {
+      color: var(--fds-color-text-default, #0d1012);
+    }
+
+    .--nav-link.is-highlight {
+      color: var(--fds-color-text-sale, #dc0428);
+    }
+
+    .--nav-caret {
+      transition: transform var(--duration-default, 200ms) var(--ease-out, ease-out);
+    }
+
+    .--nav-details[open] > .--nav-link .--nav-caret {
+      transform: rotate(180deg);
+    }
+
+    /* ---- nav panels ---- */
+    .--nav-panel {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      z-index: 30;
+      background: var(--fds-color-surface-default, #fff);
+      color: var(--fds-color-text-default, #0d1012);
+      border: var(--fds-border-width-fine, 0.1rem) solid var(--fds-color-border-default, #dee0e3);
+      border-radius: var(--fds-radii-angled, 0);
+      box-shadow: var(--box-shadow-small, 0 4px 15px 0 rgba(0, 0, 0, 0.1));
+      min-width: 22rem;
+    }
+
+    /* A mega panel must span the header, not the nav item. Making the item a
+       static box hands the containing block to .section-container, which is
+       already position: relative — so no JS positioning is needed. */
+    .--header-nav[data-menu-type='mega'] .--nav-item--has-children {
+      position: static;
+    }
+
+    .--nav-panel--mega {
+      left: 0;
+      right: 0;
+      width: 100%;
+      border-left: 0;
+      border-right: 0;
+      box-shadow: var(--box-shadow-large, 0 4px 60px 0 rgba(0, 0, 0, 0.1));
+    }
+
+    .--nav-panel-inner {
+      padding: var(--global-spacing-24, 2.4rem);
+    }
+
+    .--nav-panel--mega .--nav-panel-inner {
+      padding-block: var(--global-spacing-40, 4rem);
+    }
+
+    .--nav-sublist {
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: var(--global-spacing-8, 0.8rem);
+    }
+
+    .--nav-panel--mega .--nav-sublist {
+      grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+      gap: var(--global-spacing-24, 2.4rem);
+      align-items: start;
+    }
+
+    .--nav-subitem {
+      list-style: none;
+      min-width: 0;
+    }
+
+    .--nav-sublink {
+      display: block;
+      color: inherit;
+      text-decoration: none;
+      font-size: var(--global-type-size-14, 1.4rem);
+      line-height: var(--global-type-line-height-140pc, 1.4);
+      padding: var(--global-spacing-4, 0.4rem) 0;
+      white-space: nowrap;
+    }
+
+    .--nav-panel--mega .--nav-sublink {
+      font-weight: var(--global-type-weight-skandia-bold, 700);
+      text-transform: var(--global-type-case-upper, uppercase);
+      letter-spacing: 0.06em;
+      font-size: var(--global-type-size-12, 1.2rem);
+      color: var(--fds-color-text-muted, #767a7f);
+      margin-bottom: var(--global-spacing-4, 0.4rem);
+    }
+
+    .--nav-sublink:hover,
+    .--nav-sublink.is-active {
+      text-decoration: underline;
+      text-underline-offset: 0.3em;
+    }
+
+    .--nav-grandlist {
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: var(--global-spacing-4, 0.4rem);
+    }
+
+    .--nav-grandlist li {
+      list-style: none;
+    }
+
+    .--nav-grandlink {
+      display: block;
+      color: inherit;
+      text-decoration: none;
+      font-size: var(--global-type-size-14, 1.4rem);
+      line-height: var(--global-type-line-height-140pc, 1.4);
+      padding: var(--global-spacing-2, 0.2rem) 0;
+    }
+
+    .--nav-grandlink:hover,
+    .--nav-grandlink.is-active {
+      text-decoration: underline;
+      text-underline-offset: 0.3em;
+    }
+
+    /* ---- actions ---- */
+    .--header-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--global-spacing-8, 0.8rem);
+      {%- if layout == 'logo-nav-actions' -%}
+        margin-left: auto;
+        flex: none;
+      {%- elsif layout == 'nav-logo-actions' -%}
+        flex: 1 1 0;
+        justify-content: flex-end;
+      {%- else -%}
+        flex: none;
+      {%- endif %}
+    }
+
+    .--header-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 4rem;
+      height: 4rem;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+      list-style: none;
+      border-radius: var(--fds-radii-angled, 0);
+      text-decoration: none;
+    }
+
+    .--header-action::-webkit-details-marker {
+      display: none;
+    }
+
+    /* Demo-style cart: a bordered button carrying icon, label and count. */
+    .--header-cart-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--global-spacing-8, 0.8rem);
+      padding: 0.8rem 1.3rem;
+      border: var(--fds-border-width-fine, 0.1rem) solid var(--fds-color-border-default, #dee0e3);
+      border-radius: var(--fds-radii-angled, 0);
+      background: var(--fds-color-surface-default, #fff);
+      color: var(--fds-color-text-muted, #767a7f);
+      text-decoration: none;
+      white-space: nowrap;
+      font-family: var(--fds-type-body-family, inherit);
+      font-size: var(--global-type-size-14, 1.4rem);
+      {% if section.settings.uppercase_nav %}
+        text-transform: var(--global-type-case-upper, uppercase);
+        letter-spacing: 0.06em;
+        font-size: var(--global-type-size-12, 1.2rem);
+        font-weight: var(--global-type-weight-skandia-bold, 700);
+      {% endif %}
+      transition:
+        color var(--duration-default, 200ms) var(--ease-out, ease-out),
+        border-color var(--duration-default, 200ms) var(--ease-out, ease-out);
+    }
+
+    .--header-cart-btn:hover {
+      color: var(--fds-color-text-default, #0d1012);
+      border-color: var(--fds-color-text-muted, #767a7f);
+    }
+
+    .--header-cart-btn .--header-cart-count {
+      position: static;
+    }
+
+    .--header-cart {
+      position: relative;
+    }
+
+    .--header-cart-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 1.8rem;
+      height: 1.8rem;
+      padding: 0 0.5rem;
+      background: var(--mark-accent);
+      color: var(--fds-color-text-inverse, #fff);
+      border-radius: var(--fds-radii-relaxed, 10rem);
+      font-family: var(--fds-type-meta-family, inherit);
+      font-size: 1.1rem;
+      font-weight: var(--global-type-weight-skandia-bold, 700);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    /* Bare-icon variant keeps the count as a corner badge. */
+    .--header-cart .--header-cart-count {
+      position: absolute;
+      top: 0.4rem;
+      right: 0.2rem;
+    }
+
+    .--header-cart .--header-cart-count.is-empty {
+      display: none;
+    }
+
+    .--header-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--global-spacing-8, 0.8rem) var(--global-spacing-24, 2.4rem);
+      background: var(--fds-color-surface-inverse, #0d1012);
+      color: var(--fds-color-text-inverse, #fff);
+      border: var(--fds-border-width-regular, 0.2rem) solid transparent;
+      border-radius: var(--fds-radii-angled, 0);
+      text-decoration: none;
+      font-family: var(--fds-type-body-family, inherit);
+      font-size: var(--global-type-size-12, 1.2rem);
+      font-weight: var(--global-type-weight-skandia-bold, 700);
+      text-transform: var(--global-type-case-upper, uppercase);
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+      margin-left: var(--global-spacing-8, 0.8rem);
+    }
+
+    .--header-cta:hover {
+      background: var(--global-color-neutral-800, #1b1d22);
+    }
+
+    .--header-cta--block {
+      width: 100%;
+      padding-block: var(--global-spacing-16, 1.6rem);
+      margin-left: 0;
+    }
+
+    /* ---- inline search ---- */
+    .--header-search-panel {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      z-index: 30;
+      background: var(--fds-color-surface-default, #fff);
+      color: var(--fds-color-text-default, #0d1012);
+      border-bottom: var(--fds-border-width-fine, 0.1rem) solid var(--fds-color-border-default, #dee0e3);
+      box-shadow: var(--box-shadow-small, 0 4px 15px 0 rgba(0, 0, 0, 0.1));
+    }
+
+    .--header-search-form {
+      display: flex;
+      align-items: center;
+      gap: var(--global-spacing-16, 1.6rem);
+      padding-block: var(--global-spacing-16, 1.6rem);
+    }
+
+    .--header-search-input {
+      flex: 1 1 auto;
+      min-width: 0;
+      border: 0;
+      border-bottom: var(--fds-border-width-fine, 0.1rem) solid var(--fds-color-border-default, #dee0e3);
+      background: transparent;
+      color: inherit;
+      padding: var(--global-spacing-8, 0.8rem) 0;
+      font-family: var(--fds-type-body-family, inherit);
+      font-size: var(--global-type-size-16, 1.6rem);
+    }
+
+    .--header-search-submit {
+      border: var(--fds-border-width-regular, 0.2rem) solid currentColor;
+      background: transparent;
+      color: inherit;
+      padding: var(--global-spacing-8, 0.8rem) var(--global-spacing-16, 1.6rem);
+      border-radius: var(--fds-radii-angled, 0);
+      cursor: pointer;
+      font-family: var(--fds-type-body-family, inherit);
+      font-size: var(--global-type-size-12, 1.2rem);
+      font-weight: var(--global-type-weight-skandia-bold, 700);
+      text-transform: var(--global-type-case-upper, uppercase);
+      letter-spacing: 0.08em;
+    }
+
+    /* ---- mobile drawer ---- */
+    .--header-drawer {
+      display: none;
+      flex: none;
+    }
+
+    .--drawer-toggle-close {
+      display: none;
+    }
+
+    .--header-drawer details[open] .--drawer-toggle-open {
+      display: none;
+    }
+
+    .--header-drawer details[open] .--drawer-toggle-close {
+      display: inline-flex;
+    }
+
+    .--drawer-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      background: var(--fds-color-overlay-on-light70, rgba(13, 16, 18, 0.7));
+    }
+
+    .--drawer-panel {
+      position: fixed;
+      inset: 0 auto 0 0;
+      z-index: 41;
+      width: min(88vw, 40rem);
+      display: flex;
+      flex-direction: column;
+      background: var(--fds-color-surface-default, #fff);
+      color: var(--fds-color-text-default, #0d1012);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+
+    .--drawer-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--global-spacing-16, 1.6rem);
+      padding: var(--global-spacing-16, 1.6rem);
+      border-bottom: var(--fds-border-width-fine, 0.1rem) solid var(--fds-color-border-default, #dee0e3);
+    }
+
+    .--drawer-body {
+      flex: 1 1 auto;
+      padding: var(--global-spacing-8, 0.8rem) var(--global-spacing-16, 1.6rem);
+    }
+
+    .--drawer-list,
+    .--drawer-sublist {
+      margin: 0;
+      padding: 0;
+    }
+
+    .--drawer-item {
+      list-style: none;
+      border-bottom: var(--fds-border-width-fine, 0.1rem) solid var(--fds-color-border-default, #dee0e3);
+    }
+
+    .--drawer-sublist li {
+      list-style: none;
+    }
+
+    .--drawer-link,
+    .--drawer-sublink {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--global-spacing-8, 0.8rem);
+      width: 100%;
+      padding: var(--global-spacing-16, 1.6rem) 0;
+      color: inherit;
+      text-decoration: none;
+      cursor: pointer;
+      list-style: none;
+      font-family: var(--fds-type-body-family, inherit);
+      font-size: var(--global-type-size-16, 1.6rem);
+      font-weight: var(--global-type-weight-skandia-bold, 700);
+      {% if section.settings.uppercase_nav %}
+        text-transform: var(--global-type-case-upper, uppercase);
+        letter-spacing: 0.06em;
+      {% endif %}
+    }
+
+    .--drawer-link::-webkit-details-marker,
+    .--drawer-sublink::-webkit-details-marker {
+      display: none;
+    }
+
+    .--drawer-sublist {
+      padding-left: var(--global-spacing-16, 1.6rem);
+    }
+
+    .--drawer-sublist .--drawer-sublink {
+      padding-block: var(--global-spacing-8, 0.8rem);
+      font-weight: var(--global-type-weight-skandia-book, 400);
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    .--drawer-details[open] > .--drawer-link .--drawer-caret,
+    .--drawer-details[open] > .--drawer-sublink .--drawer-caret {
+      transform: rotate(180deg);
+    }
+
+    .--drawer-caret {
+      flex: none;
+      transition: transform var(--duration-default, 200ms) var(--ease-out, ease-out);
+    }
+
+    .--drawer-foot {
+      display: grid;
+      gap: var(--global-spacing-16, 1.6rem);
+      padding: var(--global-spacing-16, 1.6rem);
+      border-top: var(--fds-border-width-fine, 0.1rem) solid var(--fds-color-border-default, #dee0e3);
+    }
+
+    .--drawer-util {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--global-spacing-8, 0.8rem);
+      color: inherit;
+      text-decoration: none;
+      font-size: var(--global-type-size-14, 1.4rem);
+    }
+  }
+
+  /* ---- sticky ---- */
+  {%- if sticky != 'none' %}
+    sticky-header.--is-sticky .section-container--{{ section.id }} {
+      position: fixed;
+      inset: 0 0 auto;
+      {%- if section.settings.sticky_blur %}
+        /* Demo store treatment: translucent bar over a saturated blur. */
+        background: rgba(var(--color-background, 255, 255, 255), 0.92);
+        -webkit-backdrop-filter: saturate(1.1) blur(8px);
+        backdrop-filter: saturate(1.1) blur(8px);
+      {%- else %}
+        background: rgb(var(--color-background, 255, 255, 255));
+      {%- endif %}
+      color: rgb(var(--color-foreground, 13, 16, 18));
+      box-shadow: var(--box-shadow-small, 0 4px 15px 0 rgba(0, 0, 0, 0.1));
+      transition: transform var(--duration-medium, 300ms) var(--ease-out, ease-out);
+    }
+
+    {%- if sticky == 'on-scroll-up' %}
+      sticky-header.--is-sticky.--is-hidden .section-container--{{ section.id }} {
+        transform: translateY(-100%);
+      }
+    {%- endif %}
+  {%- endif %}
+
+  @media screen and (max-width: {{ bp }}px) {
+    .section-container--{{ section.id }} {
+      --header-logo-w: {{ section.settings.logo_width_mobile | append: 'px' }};
+      --bar-height: {{ section.settings.bar_height_mobile | append: 'px' }};
+      margin-top: {{ section.settings.margin_top_mobile | append: 'px' }};
+      margin-bottom: {{ section.settings.margin_bottom_mobile | append: 'px' }};
+      padding-top: {{ section.settings.padding_top_mobile | append: 'px' }};
+      padding-bottom: {{ section.settings.padding_bottom_mobile | append: 'px' }};
+    }
+
+    .section-wrapper--{{ section.id }} {
+      gap: var(--global-spacing-8, 0.8rem);
+    }
+
+    .section-container--{{ section.id }} .--header-drawer {
+      display: block;
+      order: -1;
+    }
+
+    .section-container--{{ section.id }} .--header-nav {
+      display: none;
+    }
+
+    .section-container--{{ section.id }} .--header-logo {
+      margin-right: auto;
+    }
+
+    .section-container--{{ section.id }} .--header-cta {
+      display: none;
+    }
+
+    .section-container--{{ section.id }} .--header-cart-btn .--header-cart-label {
+      display: none;
+    }
+
+    .section-container--{{ section.id }} .--header-cart-btn {
+      padding: 0.8rem 1rem;
+    }
+
+    .section-container--{{ section.id }} .--header-logo-text {
+      font-size: {{ section.settings.logo_text_size_mobile | append: 'px' }};
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .section-container--{{ section.id }} *,
+    sticky-header.--is-sticky .section-container--{{ section.id }} {
+      transition-duration: 1ms !important;
+    }
+  }
+</style>
+
+<sticky-header
+  data-sticky-type="{{ sticky }}"
+  data-section-id="{{ section.id }}"
+  {% if is_transparent %}
+    data-transparent="true"
+  {% endif %}
+>
+  <header
+    class="section-container--{{ section.id }} color-{{ section.settings.color_scheme }}{% if is_transparent %} --is-transparent{% endif %}"
+    id="{{ section.settings.navid | default: 'custom-header' }}"
+  >
+    <div class="section-wrapper--{{ section.id }}{% if section.settings.full_width != true %} page-width{% endif %}">
+      {%- render 'custom-header-drawer', section: section -%}
+      {%- render 'custom-header-logo', section: section -%}
+      {%- render 'custom-header-nav', section: section -%}
+      {%- render 'custom-header-actions', section: section -%}
+    </div>
+  </header>
+</sticky-header>
+
+{% schema %}
+{
+  "name": "Custom Header",
+  "tag": "div",
+  "class": "custom-header-section",
+  "enabled_on": {
+    "groups": [
+      "header"
+    ]
+  },
+  "max_blocks": 6,
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full Width Section",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "navid",
+      "label": "Id(for navigation)",
+      "default": "custom-header"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Bar layout"
+    },
+    {
+      "type": "select",
+      "id": "header_layout",
+      "label": "Layout",
+      "options": [
+        {
+          "value": "logo-nav-actions",
+          "label": "Logo · nav · actions right (demo store)"
+        },
+        {
+          "value": "logo-nav-center",
+          "label": "Logo left · nav centred · actions right"
+        },
+        {
+          "value": "nav-logo-actions",
+          "label": "Nav left · logo centred · actions right"
+        }
+      ],
+      "default": "logo-nav-actions"
+    },
+    {
+      "type": "range",
+      "id": "bar_height",
+      "min": 48,
+      "max": 140,
+      "step": 2,
+      "unit": "px",
+      "label": "Bar height",
+      "default": 66
+    },
+    {
+      "type": "range",
+      "id": "bar_height_mobile",
+      "min": 44,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Bar height (Mobile)",
+      "default": 58
+    },
+    {
+      "type": "range",
+      "id": "bar_gap",
+      "min": 8,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "label": "Gap between bar items",
+      "default": 26
+    },
+    {
+      "type": "select",
+      "id": "mobile_breakpoint",
+      "label": "Collapse to drawer below",
+      "options": [
+        {
+          "value": "768",
+          "label": "768px"
+        },
+        {
+          "value": "820",
+          "label": "820px"
+        },
+        {
+          "value": "1024",
+          "label": "1024px"
+        }
+      ],
+      "default": "820"
+    },
+    {
+      "type": "header",
+      "content": "Logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo image",
+      "info": "Falls back to the shop name when empty."
+    },
+    {
+      "type": "text",
+      "id": "logo_text",
+      "label": "Wordmark text",
+      "info": "Used when no logo image is set. Defaults to the shop name."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_logo_mark",
+      "label": "Show logo mark",
+      "default": true,
+      "info": "The bordered square with an accent notch, from the demo store lockup."
+    },
+    {
+      "type": "color",
+      "id": "mark_accent",
+      "label": "Accent color",
+      "default": "#004EBA",
+      "info": "Used by the logo mark and the cart count."
+    },
+    {
+      "type": "checkbox",
+      "id": "uppercase_logo",
+      "label": "Uppercase wordmark",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "min": 60,
+      "max": 320,
+      "step": 5,
+      "unit": "px",
+      "label": "Logo width",
+      "default": 130
+    },
+    {
+      "type": "range",
+      "id": "logo_width_mobile",
+      "min": 50,
+      "max": 220,
+      "step": 5,
+      "unit": "px",
+      "label": "Logo width (Mobile)",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "logo_text_size",
+      "min": 14,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Wordmark size",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "logo_text_size_mobile",
+      "min": 12,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Wordmark size (Mobile)",
+      "default": 17
+    },
+    {
+      "type": "header",
+      "content": "Navigation"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "select",
+      "id": "menu_type",
+      "label": "Submenu style",
+      "options": [
+        {
+          "value": "dropdown",
+          "label": "Dropdown"
+        },
+        {
+          "value": "mega",
+          "label": "Mega menu (full width)"
+        }
+      ],
+      "default": "dropdown"
+    },
+    {
+      "type": "checkbox",
+      "id": "uppercase_nav",
+      "label": "Uppercase navigation",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "nav_size",
+      "min": 11,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Nav link size",
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "Behaviour"
+    },
+    {
+      "type": "select",
+      "id": "sticky_header_type",
+      "label": "Sticky header",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "always",
+          "label": "Always"
+        },
+        {
+          "value": "on-scroll-up",
+          "label": "On scroll up"
+        }
+      ],
+      "default": "on-scroll-up"
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky_blur",
+      "label": "Translucent blur when stuck",
+      "default": true,
+      "info": "Frosted bar over the content below, as in the demo store."
+    },
+    {
+      "type": "checkbox",
+      "id": "transparent",
+      "label": "Transparent over first section",
+      "default": false,
+      "info": "Overlays the header on the section below until the shopper scrolls."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_border",
+      "label": "Show bottom border",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Actions"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search",
+      "label": "Show search",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "search_placeholder",
+      "label": "Search placeholder",
+      "default": "Search"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_account",
+      "label": "Show account",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cart",
+      "label": "Show cart",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "cart_style",
+      "label": "Cart style",
+      "options": [
+        {
+          "value": "button",
+          "label": "Bordered button with label (demo store)"
+        },
+        {
+          "value": "icon",
+          "label": "Icon only"
+        }
+      ],
+      "default": "button"
+    },
+    {
+      "type": "text",
+      "id": "cart_label",
+      "label": "Cart label",
+      "default": "Cart"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_wishlist",
+      "label": "Show wishlist",
+      "default": false
+    },
+    {
+      "type": "url",
+      "id": "wishlist_link",
+      "label": "Wishlist link"
+    },
+    {
+      "type": "text",
+      "id": "wishlist_label",
+      "label": "Wishlist label",
+      "default": "Wishlist"
+    },
+    {
+      "type": "header",
+      "content": "Call to action"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button label",
+      "info": "Leave empty to hide the button."
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "info": "Overrides the color scheme when set."
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color"
+    },
+    {
+      "type": "header",
+      "content": "Desktop Spacing"
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Bottom",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Mobile Spacing"
+    },
+    {
+      "type": "range",
+      "id": "margin_top_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Top (Mobile)",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Bottom (Mobile)",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Top (Mobile)",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Bottom (Mobile)",
+      "default": 12
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Highlight link",
+      "type": "highlight",
+      "settings": [
+        {
+          "type": "text",
+          "id": "link_title",
+          "label": "Menu item title",
+          "info": "Must match a top-level menu item exactly. That item is then styled as a highlight (sale colour)."
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

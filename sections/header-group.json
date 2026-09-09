@@ -1,1 +1,111 @@
-{"name":"t:sections.header.name","type":"header","sections":{"announcement-bar":{"type":"announcement-bar","blocks":{"announcement-bar-0":{"type":"announcement","settings":{"text":"Welcome to our store","link":""}}},"block_order":["announcement-bar-0"],"settings":{"auto_rotate":false,"change_slides_speed":5,"color_scheme":"scheme-1","show_line_separator":true,"show_social":false,"enable_country_selector":false,"enable_language_selector":false}},"header":{"type":"header","settings":{"logo_position":"middle-left","mobile_logo_position":"center","menu":"main-menu","menu_type_desktop":"dropdown","sticky_header_type":"on-scroll-up","show_line_separator":true,"color_scheme":"scheme-1","menu_color_scheme":"scheme-1","enable_country_selector":true,"enable_language_selector":true,"enable_customer_avatar":true,"margin_bottom":0,"padding_top":20,"padding_bottom":20}}},"order":["announcement-bar","header"]}
+{
+  "name": "t:sections.header.name",
+  "type": "header",
+  "sections": {
+    "custom-announcement-bar": {
+      "type": "custom-announcement-bar",
+      "blocks": {
+        "announcement-0": {
+          "type": "announcement",
+          "settings": {
+            "text": "Open any product and watch the price build from your measurements",
+            "link": "",
+            "icon": "ruler"
+          }
+        },
+        "announcement-1": {
+          "type": "announcement",
+          "settings": {
+            "text": "Live pricing on every product",
+            "link": "",
+            "icon": "spark"
+          }
+        },
+        "announcement-2": {
+          "type": "announcement",
+          "settings": {
+            "text": "No quote forms, no waiting",
+            "link": "",
+            "icon": "check"
+          }
+        }
+      },
+      "block_order": [
+        "announcement-0",
+        "announcement-1",
+        "announcement-2"
+      ],
+      "settings": {
+        "full_width": false,
+        "color_scheme": "scheme-3",
+        "layout": "revolving",
+        "alignment": "center",
+        "uppercase": true,
+        "show_border": false,
+        "show_on_mobile": true,
+        "dismissible": false,
+        "auto_rotate": true,
+        "rotate_speed": 5,
+        "margin_top": 0,
+        "margin_bottom": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "margin_top_mobile": 0,
+        "margin_bottom_mobile": 0,
+        "padding_top_mobile": 0,
+        "padding_bottom_mobile": 0
+      }
+    },
+    "custom-header": {
+      "type": "custom-header",
+      "settings": {
+        "full_width": false,
+        "navid": "custom-header",
+        "color_scheme": "scheme-1",
+        "logo_width": 130,
+        "logo_width_mobile": 100,
+        "menu": "main-menu",
+        "menu_type": "dropdown",
+        "uppercase_nav": false,
+        "sticky_header_type": "on-scroll-up",
+        "transparent": false,
+        "show_border": true,
+        "show_search": true,
+        "search_placeholder": "Search",
+        "show_account": true,
+        "show_cart": true,
+        "show_wishlist": false,
+        "wishlist_label": "Wishlist",
+        "cta_label": "",
+        "cta_link": "",
+        "margin_top": 0,
+        "margin_bottom": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "margin_top_mobile": 0,
+        "margin_bottom_mobile": 0,
+        "padding_top_mobile": 0,
+        "padding_bottom_mobile": 0,
+        "header_layout": "logo-nav-actions",
+        "bar_height": 66,
+        "bar_height_mobile": 58,
+        "bar_gap": 26,
+        "mobile_breakpoint": "820",
+        "logo_text": "Amaze Price Builder",
+        "show_logo_mark": true,
+        "mark_accent": "#004EBA",
+        "uppercase_logo": true,
+        "logo_text_size": 20,
+        "logo_text_size_mobile": 17,
+        "nav_size": 14,
+        "sticky_blur": true,
+        "cart_style": "button",
+        "cart_label": "Cart"
+      }
+    }
+  },
+  "order": [
+    "custom-announcement-bar",
+    "custom-header"
+  ]
+}

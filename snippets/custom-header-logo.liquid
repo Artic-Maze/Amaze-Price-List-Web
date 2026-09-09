@@ -1,0 +1,65 @@
+{% comment %}
+  Renders the header logo.
+
+  Three shapes, matching the demo store's lockup:
+  - a picked image, used alone;
+  - otherwise a square "mark" plus the shop name as a wordmark;
+  - the mark can be turned off to leave the wordmark on its own.
+
+  The mark is the demo's measurement motif: a bordered square with a small
+  accent square notched into its top-right corner.
+
+  Markup only; styling lives in sections/custom-header.liquid.
+
+  Accepts:
+  - section: {Object} the header section (required)
+
+  Usage:
+  {% render 'custom-header-logo', section: section %}
+{% endcomment %}
+
+{%- liquid
+  assign logo = section.settings.logo
+  assign logo_width = section.settings.logo_width | default: 130
+  assign wordmark = section.settings.logo_text | default: shop.name
+-%}
+
+{%- capture logo_inner -%}
+  {%- if logo != blank -%}
+    {{
+      logo
+      | image_url: width: 600
+      | image_tag:
+        class: '--header-logo-image',
+        widths: '120, 180, 240, 360, 480, 600',
+        sizes: logo_width | append: 'px',
+        loading: 'eager',
+        fetchpriority: 'high',
+        alt: shop.name
+    }}
+  {%- else -%}
+    {%- if section.settings.show_logo_mark -%}
+      <span class="--logo-mark" aria-hidden="true"></span>
+    {%- endif -%}
+    <span class="--header-logo-text">{{ wordmark }}</span>
+  {%- endif -%}
+{%- endcapture -%}
+
+{%- comment -%}
+  Always a link, never a heading. The page's h1 belongs to its own content —
+  on the homepage that is the hero headline — and a logo h1 would compete
+  with it for both assistive tech and search engines.
+{%- endcomment -%}
+
+<a
+  class="--header-logo"
+  href="{{ routes.root_url }}"
+  {% if request.page_type == 'index' %}
+    aria-current="page"
+  {% endif %}
+>
+  {{ logo_inner }}
+  {%- if logo != blank -%}
+    <span class="visually-hidden">{{ shop.name }}</span>
+  {%- endif -%}
+</a>

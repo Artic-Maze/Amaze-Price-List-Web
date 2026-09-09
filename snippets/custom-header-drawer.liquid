@@ -1,0 +1,127 @@
+{% comment %}
+  Renders the mobile navigation drawer for the custom header.
+
+  The trigger is a <summary> inside a <details>, so the drawer opens without JS;
+  the <header-drawer> custom element in assets/custom-header.js adds focus
+  trapping, scroll locking and Escape-to-close.
+
+  Markup only; styling lives in sections/custom-header.liquid.
+
+  Accepts:
+  - section: {Object} the header section (required)
+
+  Usage:
+  {% render 'custom-header-drawer', section: section %}
+{% endcomment %}
+
+{%- liquid
+  assign menu = section.settings.menu
+-%}
+
+<header-drawer class="--header-drawer">
+  <details data-drawer-details>
+    <summary
+      class="--header-action --drawer-toggle"
+      aria-label="{{ 'sections.header.menu' | t }}"
+    >
+      <span class="--drawer-toggle-open">
+        {%- render 'custom-icons', name: 'menu', size: 22 -%}
+      </span>
+      <span class="--drawer-toggle-close">
+        {%- render 'custom-icons', name: 'close', size: 22 -%}
+      </span>
+    </summary>
+
+    <div class="--drawer-overlay" data-drawer-overlay></div>
+
+    <div class="--drawer-panel" data-drawer-panel role="dialog" aria-modal="true" aria-label="{{ 'sections.header.menu' | t }}">
+      <div class="--drawer-head">
+        {%- render 'custom-header-logo', section: section -%}
+        <button
+          type="button"
+          class="--header-action"
+          data-drawer-close
+          aria-label="{{ 'accessibility.close' | t }}"
+        >
+          {%- render 'custom-icons', name: 'close', size: 22 -%}
+        </button>
+      </div>
+
+      <div class="--drawer-body">
+        {%- if menu != blank and menu.links.size > 0 -%}
+          <nav aria-label="{{ 'sections.header.menu' | t }}">
+            <ul class="--drawer-list" role="list">
+              {%- for link in menu.links -%}
+                <li class="--drawer-item">
+                  {%- if link.links.size > 0 -%}
+                    <details class="--drawer-details">
+                      <summary class="--drawer-link">
+                        <span>{{ link.title | escape }}</span>
+                        {%- render 'custom-icons', name: 'chevron-down', size: 16, class: '--drawer-caret' -%}
+                      </summary>
+
+                      <ul class="--drawer-sublist" role="list">
+                        {%- for child in link.links -%}
+                          <li>
+                            {%- if child.links.size > 0 -%}
+                              <details class="--drawer-details">
+                                <summary class="--drawer-sublink">
+                                  <span>{{ child.title | escape }}</span>
+                                  {%- render 'custom-icons', name: 'chevron-down', size: 14, class: '--drawer-caret' -%}
+                                </summary>
+                                <ul class="--drawer-sublist" role="list">
+                                  {%- for grandchild in child.links -%}
+                                    <li>
+                                      <a class="--drawer-sublink" href="{{ grandchild.url }}">
+                                        {{- grandchild.title | escape -}}
+                                      </a>
+                                    </li>
+                                  {%- endfor -%}
+                                </ul>
+                              </details>
+                            {%- else -%}
+                              <a class="--drawer-sublink" href="{{ child.url }}">{{ child.title | escape }}</a>
+                            {%- endif -%}
+                          </li>
+                        {%- endfor -%}
+                      </ul>
+                    </details>
+                  {%- else -%}
+                    <a class="--drawer-link" href="{{ link.url }}">
+                      <span>{{ link.title | escape }}</span>
+                    </a>
+                  {%- endif -%}
+                </li>
+              {%- endfor -%}
+            </ul>
+          </nav>
+        {%- endif -%}
+      </div>
+
+      <div class="--drawer-foot">
+        {%- if section.settings.cta_label != blank -%}
+          <a
+            class="--header-cta --header-cta--block"
+            href="{{ section.settings.cta_link | default: routes.all_products_collection_url }}"
+          >
+            {{- section.settings.cta_label | escape -}}
+          </a>
+        {%- endif -%}
+
+        {%- if section.settings.show_account and shop.customer_accounts_enabled -%}
+          <a
+            class="--drawer-util"
+            href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}"
+          >
+            {%- render 'custom-icons', name: 'account', size: 18 -%}
+            {%- if customer -%}
+              {{ 'customer.account_fallback' | t }}
+            {%- else -%}
+              {{ 'customer.log_in' | t }}
+            {%- endif -%}
+          </a>
+        {%- endif -%}
+      </div>
+    </div>
+  </details>
+</header-drawer>

@@ -1,0 +1,117 @@
+{% comment %}
+  Renders the header utility actions — search, account and cart.
+
+  Search is a real <form> inside a <details> disclosure, so it submits to the
+  search results page even before JS runs.
+
+  Markup only; styling lives in sections/custom-header.liquid.
+
+  Accepts:
+  - section: {Object} the header section (required)
+
+  Usage:
+  {% render 'custom-header-actions', section: section %}
+{% endcomment %}
+
+<div class="--header-actions">
+  {%- if section.settings.show_search -%}
+    <details class="--header-search" data-header-search>
+      <summary class="--header-action" aria-label="{{ 'general.search.search' | t }}">
+        {%- render 'custom-icons', name: 'search', size: 20 -%}
+      </summary>
+
+      <div class="--header-search-panel">
+        <form
+          class="--header-search-form page-width"
+          action="{{ routes.search_url }}"
+          method="get"
+          role="search"
+        >
+          <label class="visually-hidden" for="header-search-{{ section.id }}">
+            {{- 'general.search.search' | t -}}
+          </label>
+          {%- render 'custom-icons', name: 'search', size: 20 -%}
+          <input
+            id="header-search-{{ section.id }}"
+            class="--header-search-input"
+            type="search"
+            name="q"
+            value="{{ search.terms | escape }}"
+            placeholder="{{ section.settings.search_placeholder | default: 'Search' | escape }}"
+            autocomplete="off"
+          >
+          <button type="submit" class="--header-search-submit">
+            {{- 'general.search.search' | t -}}
+          </button>
+          <button
+            type="button"
+            class="--header-action"
+            data-search-close
+            aria-label="{{ 'accessibility.close' | t }}"
+          >
+            {%- render 'custom-icons', name: 'close', size: 20 -%}
+          </button>
+        </form>
+      </div>
+    </details>
+  {%- endif -%}
+
+  {%- if section.settings.show_account and shop.customer_accounts_enabled -%}
+    <a
+      class="--header-action"
+      href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}"
+    >
+      {%- render 'custom-icons', name: 'account', size: 20 -%}
+      <span class="visually-hidden">
+        {%- if customer -%}
+          {{ 'customer.account_fallback' | t }}
+        {%- else -%}
+          {{ 'customer.log_in' | t }}
+        {%- endif -%}
+      </span>
+    </a>
+  {%- endif -%}
+
+  {%- if section.settings.show_wishlist and section.settings.wishlist_link != blank -%}
+    <a class="--header-action" href="{{ section.settings.wishlist_link }}">
+      {%- render 'custom-icons', name: 'heart', size: 20 -%}
+      <span class="visually-hidden">{{ section.settings.wishlist_label | default: 'Wishlist' }}</span>
+    </a>
+  {%- endif -%}
+
+  {%- if section.settings.show_cart -%}
+    {%- liquid
+      assign cart_style = section.settings.cart_style | default: 'button'
+      assign cart_label = section.settings.cart_label | default: 'Cart'
+    -%}
+    <a
+      class="--header-{% if cart_style == 'button' %}cart-btn{% else %}action --header-cart{% endif %}"
+      href="{{ routes.cart_url }}"
+      data-cart-link
+    >
+      {%- render 'custom-icons', name: 'bag', size: 16, stroke: 1.8 -%}
+
+      {%- if cart_style == 'button' -%}
+        <span class="--header-cart-label">{{ cart_label | escape }}</span>
+      {%- endif -%}
+
+      <span class="visually-hidden">
+        {{- 'sections.header.cart_count' | t: count: cart.item_count -}}
+      </span>
+
+      <span
+        class="--header-cart-count{% if cart.item_count == 0 and cart_style != 'button' %} is-empty{% endif %}"
+        data-cart-count
+        aria-hidden="true"
+      >
+        {{- cart.item_count -}}
+      </span>
+    </a>
+  {%- endif -%}
+
+  {%- if section.settings.cta_label != blank -%}
+    <a class="--header-cta" href="{{ section.settings.cta_link | default: routes.all_products_collection_url }}">
+      {{- section.settings.cta_label | escape -}}
+    </a>
+  {%- endif -%}
+</div>

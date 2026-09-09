@@ -54,7 +54,9 @@
       "of": "of",
       "next_slide": "Slide right",
       "previous_slide": "Slide left",
-      "name": "Slider"
+      "name": "Slider",
+      "pause_slideshow": "Pause slideshow",
+      "play_slideshow": "Play slideshow"
     }
   },
   "newsletter": {
@@ -274,7 +276,6 @@
       "announcement": "Announcement",
       "announcement_bar": "Announcement bar"
     },
-
     "header": {
       "announcement": "Announcement",
       "menu": "Menu",

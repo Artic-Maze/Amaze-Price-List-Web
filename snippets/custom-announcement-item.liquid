@@ -1,0 +1,49 @@
+{% comment %}
+  Renders one announcement inside the custom announcement bar.
+
+  Markup only — styling lives in sections/custom-announcement-bar.liquid so the
+  <style> block is emitted once per section rather than once per block.
+
+  Accepts:
+  - block:   {Object} the announcement block (required)
+  - is_first: {Boolean} true for the block that is visible on first paint
+
+  Usage:
+  {% render 'custom-announcement-item', block: block, is_first: forloop.first %}
+{% endcomment %}
+
+{%- liquid
+  assign has_link = false
+  if block.settings.link != blank
+    assign has_link = true
+  endif
+-%}
+
+<div
+  class="--announcement-item{% if is_first %} is-active{% endif %}"
+  {% unless is_first %}
+    aria-hidden="true"
+  {% endunless %}
+  {{ block.shopify_attributes }}
+>
+  {%- if has_link -%}
+    <a class="--announcement-link" href="{{ block.settings.link }}">
+  {%- else -%}
+    <span class="--announcement-link">
+  {%- endif -%}
+
+  {%- if block.settings.icon != 'none' -%}
+    {%- render 'custom-icons', name: block.settings.icon, size: 16 -%}
+  {%- endif -%}
+
+  {%- if block.settings.text != blank -%}
+    <span class="--announcement-text">{{ block.settings.text }}</span>
+  {%- endif -%}
+
+  {%- if has_link -%}
+    {%- render 'custom-icons', name: 'arrow-right', size: 14, class: '--announcement-arrow' -%}
+    </a>
+  {%- else -%}
+    </span>
+  {%- endif -%}
+</div>
