@@ -1,278 +1,566 @@
+@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap");
 
-@font-face {
-  font-family: "Satoshi";
-  src: url("https://cdn.shopify.com/s/files/1/0751/0464/9384/files/Satoshi-Regular.woff2?v=1778573152")
-    format("woff2");
-    font-display: swap;
-}
-@font-face {
-  font-family: "Satoshi Medium";
-  src: url("https://cdn.shopify.com/s/files/1/0751/0464/9384/files/Satoshi-Medium.woff?v=1778675592")
-    format("woff");
-    font-display: swap;
-}
-@font-face {
-  font-family: "Satoshi Bold";
-  src: url("https://cdn.shopify.com/s/files/1/0751/0464/9384/files/Satoshi-Bold.woff?v=1778675596")
-    format("woff");
-    font-display: swap;
-}
+/* ===========================================================================
+   GYMSHARK DESIGN TOKENS
+   ---------------------------------------------------------------------------
+   Source : gymshark_tokens.json + gymshark_report.md  (row.gymshark.com)
+   Layer  : this file loads AFTER base.css (theme.liquid:283 then :286), so
+            these :root values win the cascade. Custom properties resolve at
+            computed-value time rather than declaration order, so every rule
+            inside base.css can reference the tokens defined here.
+   Units  : Dawn sets html{font-size:62.5%} -> 10px root, which is the same
+            root Gymshark uses. Every rem value below is therefore transcribed
+            1:1 from the extraction with no conversion.
 
+   TWO DELIBERATE DEVIATIONS FROM THE RAW EXTRACTION
+   ---------------------------------------------------------------------------
+   1. TYPEFACES. "Plaak Gymshark" and "SN Skandia" are proprietary licensed
+      faces and cannot be redistributed. Every size / weight / line-height /
+      letter-spacing token below is preserved exactly as extracted; only the
+      two family pointers are substituted:
 
+          Plaak Gymshark  ->  Archivo   (heavy grotesque display, 500 + 800)
+          SN Skandia      ->  Inter     (neo-grotesque text, 400 + 700)
 
+      If the real files are ever licensed, replace the two
+      --global-type-family-* values and the @import above. Nothing else needs
+      to change.
+
+   2. REPAIRED TOKENS. Nine values in the extraction resolved to the literal
+      keyword `black` or `#fff`. Those are getComputedStyle artifacts -- the
+      extractor could not resolve the alias and fell back to the inherited
+      colour. Each is repaired to its real slot in the neutral ramp, with the
+      raw extracted value recorded inline as `was:`.
+
+      The report corroborates the repairs: its computed-style table shows
+      `label` rendering rgb(118,122,127) = #767a7f, which is the real "muted"
+      value, and its painted-colours table shows #f4f5f6 on 24 elements, which
+      is the real "surface-subtle".
+
+      Search this file for "was:" to review every repair.
+   =========================================================================== */
+
+/* ---------------------------------------------------------------------------
+   1. PRIMITIVES -- COLOUR
+   Raw palette. Nothing in the theme should reference these directly; use the
+   --fds-color-* semantic layer in section 2 instead.
+   --------------------------------------------------------------------------- */
 :root {
+  /* Neutral ramp */
+  --global-color-neutral-100: #f4f5f6;
+  --global-color-neutral-200: #dee0e3;
+  --global-color-neutral-300: #bec2c6;
+  --global-color-neutral-400: #9fa3a8;
+  --global-color-neutral-500: #767a7f;
+  --global-color-neutral-600: #575b60;
+  --global-color-neutral-700: #3f4247;
+  --global-color-neutral-800: #1b1d22;
+  --global-color-neutral-black: #0d1012;
+  --global-color-neutral-full-black: #000000;
+  --global-color-neutral-white: #ffffff;
 
+  /* Ocean (accent / link) */
+  --global-color-ocean-100: #edf4fc;
+  --global-color-ocean-200: #c5daf7;
+  --global-color-ocean-300: #85b3f4;
+  --global-color-ocean-400: #4386e5;
+  --global-color-ocean-500: #004eba;
+  --global-color-ocean-600: #003b8f;
+  --global-color-ocean-700: #002b66;
+  --global-color-ocean-800: #00193d;
 
-  --font-family-Body:  "Satoshi";
-  --font-family-Body-Bold:  "Satoshi Bold";
-  --font-body-family: "Satoshi";
-  --font-body-family--Light: "Satoshi";
+  /* Red (sale / error) */
+  --global-color-red-100: #fff0f3;
+  --global-color-red-200: #ffc7d2;
+  --global-color-red-300: #ff8fa5;
+  --global-color-red-400: #fe4867;
+  --global-color-red-500: #dc0428;
+  --global-color-red-600: #9e071b;
+  --global-color-red-700: #5a080d;
+  --global-color-red-800: #320808;
+  --global-color-red-hc-dark: #ff8fa5;
 
- 
-  /* --font-heading-family: "Satoshi Bold"; */
-   --font-family-Title: var(--font-heading-family);
-  --font-family-Heading: var(--font-heading-family);
-  
+  /* Green (positive) */
+  --global-color-green-100: #e1f4ee;
+  --global-color-green-200: #c3eee0;
+  --global-color-green-300: #73d3b3;
+  --global-color-green-400: #29bc8b;
+  --global-color-green-500: #009966;
+  --global-color-green-600: #006644;
+  --global-color-green-700: #003d29;
+  --global-color-green-800: #00291c;
+  --global-color-green-hc-dark: #00e890;
 
-  /* --font-family-Control: "Gotham"; */
-  --font-family-Control: "Satoshi";
+  /* Yellow (warning) */
+  --global-color-yellow-100: #fff8eb;
+  --global-color-yellow-200: #ffebc2;
+  --global-color-yellow-300: #ffd685;
+  --global-color-yellow-400: #ffc247;
+  --global-color-yellow-500: #f5a70a;
+  --global-color-yellow-600: #c17e01;
+  --global-color-yellow-700: #784d02;
+  --global-color-yellow-800: #3c2401;
+  --global-color-yellow-hc-light: #7a5200;
 
+  /* Named brand colours */
+  --global-color-brand-chalk: #9aa8ad;
+  --global-color-brand-electric: #41d9e4;
+  --global-color-brand-ice: #dff2f0;
+  --global-color-brand-ocean-blue: #004eba;
+  --global-color-brand-steel: #495c63;
 
-  --brand-color-1: #112f15;
+  /* Seasonal theme tests (carried over verbatim) */
+  --global-color-theme-test-soft-sculpt-1: #57443e;
+  --global-color-theme-test-summer-1: #ff677a;
 
-  --main-800: #1f2937;
-  --main-200: #e5e7eb;
+  /* Loyalty tiers */
+  --tier-1-bkg-color: #cecfd0;
+  --tier-1-color: #424145;
+  --tier-2-bkg-color: #2d4e4a;
+  --tier-2-color: #8bd2b3;
+  --tier-3-bkg-color: #374e7f;
+  --tier-3-color: #aebde1;
+  --tier-4-bkg-color: #7d405f;
+  --tier-4-color: #d88d8d;
 
-  --base-600: #4b5563;
-  --base-300: #d1d5db;
+  /* Glass surfaces */
+  --glass-dark-background-color: rgba(0, 0, 0, 0.8);
+  --glass-light-background-color: rgba(255, 255, 255, 0.5);
+  --glass-lightest-background-color: rgba(255, 255, 255, 0.3);
+  --glass-medium-background-color: rgba(255, 255, 255, 0.75);
+  --glass-backdrop-filter-10: blur(10px);
+  --glass-backdrop-filter-40: blur(40px);
+  --glass-backdrop-filter-50: blur(50px);
 
-  --subtle-400: #9ca3af;
-  --subtle-500: #6b7280;
+  /* Misc one-offs from the extraction */
+  --particles-color-grey-900: #fff;
+  --stage-text-color: #000;
+}
 
-  --highlight-900: #312e81;
-  --highlight-500: #eef2ff;
+/* ---------------------------------------------------------------------------
+   2. SEMANTIC -- COLOUR  (--fds-color-*)
+   This is the layer sections and components should consume.
+   --------------------------------------------------------------------------- */
+:root {
+  /* Surface */
+  --fds-color-surface-default: #ffffff;
+  --fds-color-surface-inverse: #0d1012;
+  --fds-color-surface-subdued: #dee0e3;
+  --fds-color-surface-subtle: var(--global-color-neutral-100); /* was: black -- unresolved alias; a subtle surface in a light theme is neutral-100 (#f4f5f6), painted on 24 elements per the report */
+  --fds-color-surface-accent: #004eba;
+  --fds-color-surface-always-black: #0d1012;
+  --fds-color-surface-always-white: #ffffff;
 
-  --disabled-100: #f3f4f6;
-  --disabled-800: #1f2937;
-  /* Base */
-
-  /* Inverted */
-  --main-100: #f3f4f6;
-  --base-300: #d1d5db;
-  --subtle-500: #6b7280;
-  --highlight-500: #eef2ff;
-  --disabled-800: #1f2937;
-  /* Inverted */
+  /* Text */
+  --fds-color-text-default: var(--global-color-neutral-black); /* was: black -- unresolved alias; canonical text black is #0d1012, matching --fds-color-text-always-black */
+  --fds-color-text-subtle: var(--global-color-neutral-600); /* was: black -- unresolved alias; subtle text is neutral-600 (#575b60) */
+  --fds-color-text-muted: var(--global-color-neutral-500); /* was: black -- unresolved alias; report shows `label` computing rgb(118,122,127) = #767a7f */
+  --fds-color-text-disabled: #bec2c6;
+  --fds-color-text-inverse: #ffffff;
+  --fds-color-text-accent: #004eba;
+  --fds-color-text-link: #0d1012;
+  --fds-color-text-sale: #dc0428;
+  --fds-color-text-always-black: #0d1012;
+  --fds-color-text-always-white: #ffffff;
 
   /* Border */
-  --main-300: #d1d5db;
-  --main-600: #4b5563;
+  --fds-color-border-default: #dee0e3;
+  --fds-color-border-strong: #0d1012;
 
-  --subtle-200: #e5e7eb;
-  --subtle-700: #374151;
+  /* Icon */
+  --fds-color-icon-default: var(--global-color-neutral-black); /* was: #fff -- unresolved alias; --fds-color-icon-inverse is already #ffffff, so default must be the dark one */
+  --fds-color-icon-inverse: #ffffff;
+  --fds-color-icon-disabled: #bec2c6;
+  --fds-color-icon-sale: #dc0428;
+  --fds-color-icon-always-black: #0d1012;
+  --fds-color-icon-always-white: #ffffff;
 
-  --disabled-100: #f3f4f6;
-  --disabled-800: #1f2937;
+  /* Feedback */
+  --fds-color-feedback-error: #dc0428;
+  --fds-color-feedback-positive: #009966;
+  --fds-color-feedback-warning: #f5a70a;
 
-  --dense-600: #4b5563;
-  --dense-300: #d1d5db;
+  /* Overlay */
+  --fds-color-overlay-on-dark: rgba(255, 255, 255, 0.15);
+  --fds-color-overlay-on-light15: rgba(13, 16, 18, 0.15);
+  --fds-color-overlay-on-light70: rgba(13, 16, 18, 0.7);
+
+  /* Legacy aliases still present in the extraction */
+  --color-text-primary: var(--fds-color-text-default); /* was: black */
+  --color-text-secondary: var(--fds-color-text-subtle); /* was: black */
+  --color-text-tertiary: var(--fds-color-text-muted); /* was: black */
+  --color-foreground-sixth: var(--global-color-neutral-400); /* was: black -- sixth step down the neutral ramp */
 }
 
+/* ---------------------------------------------------------------------------
+   3. PRIMITIVES -- TYPOGRAPHY
+   --------------------------------------------------------------------------- */
 :root {
-  /* Heading Sizes */
-  --Font-Size-Heading-H1: 72px;
-  --Font-Size-Heading-H2: 60px;
-  --Font-Size-Heading-H3: 20px;
-  --Font-Size-Heading-H4: 20px;
-  --Font-Size-Heading-H5: 18px;
+  /* Families. See deviation 1 in the header for the substitution rationale. */
+  --global-type-family-plaak: "Archivo", "Archivo Black", Impact, Haettenschweiler, sans-serif;
+  --global-type-family-skandia: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --global-type-family-montserrat: Montserrat, Helvetica, Arial, sans-serif;
+  --global-type-family-roboto: Roboto, Helvetica, Arial, sans-serif;
+  --global-type-family-anton: Anton, Helvetica, Arial, sans-serif;
+  --global-type-family-itc-gothic: "ITC Franklin Gothic LT Pro", Helvetica, Arial, sans-serif;
+  --global-type-family-ivy-presto-display: "IvyPresto Display", Georgia, serif;
+  --font-family-anton: Anton, Montserrat, Helvetica, Arial, sans-serif;
+  --font-family-bebas-neue: "Bebas Neue", Helvetica, Arial, sans-serif;
+  --font-family-druk-condensed-super: "Druk Condensed Super", Helvetica, Arial, sans-serif;
 
-  /* @media (max-width: 1280px) {
-    --Font-Size-Heading-H1: 40px;
-    --Font-Size-Heading-H2: 32px;
-    --Font-Size-Heading-H3: 20px;
-    --Font-Size-Heading-H4: 18px;
-    --Font-Size-Heading-H5: 18px;
-  } */
+  /* Weights */
+  --global-type-weight-light: 300;
+  --global-type-weight-regular: 400;
+  --global-type-weight-medium: 500;
+  --global-type-weight-semibold: 600;
+  --global-type-weight-bold: 700;
+  --global-type-weight-skandia-book: 400;
+  --global-type-weight-skandia-bold: 700;
+  --global-type-weight-plaak-midweight: 500;
+  --global-type-weight-plaak-heavyweight: 800;
 
-  @media (max-width: 768px) {
-    --Font-Size-Heading-H1: 36px;
-    --Font-Size-Heading-H2: 32px;
-    /* --Font-Size-Heading-H3: 20px; */
-     --Font-Size-Heading-H3: 17px;
-    --Font-Size-Heading-H4: 18px;
-    --Font-Size-Heading-H5: 16px;
-  }
+  /* Size ramp */
+  --global-type-size-12: 1.2rem;
+  --global-type-size-14: 1.4rem;
+  --global-type-size-16: 1.6rem;
+  --global-type-size-18: 1.8rem;
+  --global-type-size-20: 2rem;
+  --global-type-size-22: 2.2rem;
+  --global-type-size-24: 2.4rem;
+  --global-type-size-28: 2.8rem;
+  --global-type-size-32: 3.2rem;
+  --global-type-size-40: 4rem;
+  --global-type-size-48: 4.8rem;
+  --studio-title-font-size: 5.2rem;
+  --studio-title-line-height: 5.2rem;
+  --weightWidth: 8.8rem;
 
-  /* heading Line height */
+  /* Line heights */
+  --global-type-line-height-83pc: 0.83;
+  --global-type-line-height-84pc: 0.84;
+  --global-type-line-height-86pc: 0.86;
+  --global-type-line-height-90pc: 0.9;
+  --global-type-line-height-94pc: 0.94;
+  --global-type-line-height-100pc: 1;
+  --global-type-line-height-110pc: 1.1;
+  --global-type-line-height-115pc: 1.15;
+  --global-type-line-height-118pc: 1.18;
+  --global-type-line-height-120pc: 1.2;
+  --global-type-line-height-130pc: 1.3;
+  --global-type-line-height-140pc: 1.4;
+  --global-type-line-height-150pc: 1.5;
+  --global-type-line-height-160pc: 1.6;
 
-  --Line-Height-Heading-H1: 78px;
-  --Line-Height-Heading-H2: 66px;
-  --Line-Height-Heading-H3: 24px;
-  --Line-Height-Heading-H4: 28px;
-  --Line-Height-Heading-H5: 24px;
+  /* Letter spacing */
+  --global-type-letterspacing-0pc: 0;
+  --global-type-letterspacing-1pc: 0.001rem;
+  --global-type-letterspacing-1neg-pc: -0.001rem;
+  --global-type-letterspacing-1-75neg-pc: -0.00175rem;
+  --global-type-letterspacing-2pc: 0.002rem;
+  --global-type-letterspacing-2neg-pc: -0.002rem;
+  --global-type-letterspacing-2-5pc: 0.0025rem;
+  --global-type-letterspacing-2-65pc: 0.00265rem;
 
-  /* @media (max-width: 1280px) {
-    --Line-Height-Heading-H1: 40px;
-    --Line-Height-Heading-H2: 40px;
-    --Line-Height-Heading-H3: 28px;
-    --Line-Height-Heading-H4: 22px;
-    --Line-Height-Heading-H5: 20px;
-  } */
+  /* Case */
+  --global-type-case-none: none;
+  --global-type-case-upper: uppercase;
+}
 
-  @media (max-width: 768px) {
-    --Line-Height-Heading-H1: 44px;
-    --Line-Height-Heading-H2: 32px;
-    --Line-Height-Heading-H3: 20px;
-    --Line-Height-Heading-H4: 22px;
-    --Line-Height-Heading-H5: 20px;
-  }
+/* ---------------------------------------------------------------------------
+   4. SEMANTIC -- TYPOGRAPHY  (--fds-type-*)
 
-  /* Paragraph Sizes */
+   Each role is published twice:
+     * the `font:` shorthand, transcribed verbatim from the extraction, for
+       traceability back to the report;
+     * a longhand set (-family / -weight / -size / -leading), which is what
+       the theme actually consumes. The shorthand is fragile inside calc()
+       and cannot be partially overridden, so rules should use the longhands.
+   --------------------------------------------------------------------------- */
+:root {
+  /* Display -- largest Plaak step */
+  --fds-type-display-fluid: 800 clamp(3.2rem, 2.64rem + 1.5vw, 4.8rem) /0.9 "Plaak Gymshark";
+  --fds-type-display-max: 800 4.8rem/0.9 "Plaak Gymshark";
+  --fds-type-display-min: 800 3.2rem/0.9 "Plaak Gymshark";
+  --fds-type-display-max-non-english: 800 4.8rem/1.1 "Plaak Gymshark";
+  --fds-type-display-min-non-english: 800 3.2rem/1.1 "Plaak Gymshark";
+  --fds-type-display-family: var(--global-type-family-plaak);
+  --fds-type-display-weight: var(--global-type-weight-plaak-heavyweight);
+  --fds-type-display-size: clamp(3.2rem, 2.64rem + 1.5vw, 4.8rem);
+  --fds-type-display-leading: var(--global-type-line-height-90pc);
 
-  --Font-Size-Paragraph-Large: 18px;
-  --Font-Size-Paragraph-Medium: 16px;
-  --Font-Size-Paragraph-Regular: 14px;
-  --Font-Size-Paragraph-Small: 14px;
-  --Font-Size-Paragraph-Tiny: 12px;
+  /* Title -- mid Plaak step */
+  --fds-type-title-fluid: 800 clamp(2.4rem, 2.12rem + 0.75vw, 3.2rem) /0.9 "Plaak Gymshark";
+  --fds-type-title-max: 800 3.2rem/0.9 "Plaak Gymshark";
+  --fds-type-title-min: 800 2.4rem/0.9 "Plaak Gymshark";
+  --fds-type-title-family: var(--global-type-family-plaak);
+  --fds-type-title-weight: var(--global-type-weight-plaak-heavyweight);
+  --fds-type-title-size: clamp(2.4rem, 2.12rem + 0.75vw, 3.2rem);
+  --fds-type-title-leading: var(--global-type-line-height-90pc);
 
-  /* @media (max-width: 1280px) {
-    --Font-Size-Paragraph-Large: 16px;
-    --Font-Size-Paragraph-Medium: 15px;
-    --Font-Size-Paragraph-Regular: 14px;
-    --Font-Size-Paragraph-Small: 13px;
-    --Font-Size-Paragraph-Tiny: 12px;
-  } */
+  /* Heading -- smallest Plaak step, midweight */
+  --fds-type-heading-fluid: 500 clamp(1.8rem, 1.73rem + 0.19vw, 2rem) /0.94 "Plaak Gymshark";
+  --fds-type-heading-max: 500 2rem/0.94 "Plaak Gymshark";
+  --fds-type-heading-min: 500 1.8rem/0.94 "Plaak Gymshark";
+  --fds-type-heading-family: var(--global-type-family-plaak);
+  --fds-type-heading-weight: var(--global-type-weight-plaak-midweight);
+  --fds-type-heading-size: clamp(1.8rem, 1.73rem + 0.19vw, 2rem);
+  --fds-type-heading-leading: var(--global-type-line-height-94pc);
 
-  @media (max-width: 768px) {
-    --Font-Size-Paragraph-Large: 16px;
-    --Font-Size-Paragraph-Medium: 15px;
-    --Font-Size-Paragraph-Regular: 14px;
-    --Font-Size-Paragraph-Small: 13px;
-    --Font-Size-Paragraph-Tiny: 12px;
-  }
+  /* Impact -- large Skandia, used where a headline needs text-face warmth */
+  --fds-type-impact-fluid: 400 clamp(2.4rem, 2.12rem + 0.75vw, 3.2rem) /1.15 "SN Skandia";
+  --fds-type-impact-max: 400 3.2rem/1.2 "SN Skandia";
+  --fds-type-impact-min: 400 2.4rem/1.15 "SN Skandia";
+  --fds-type-impact-family: var(--global-type-family-skandia);
+  --fds-type-impact-weight: var(--global-type-weight-skandia-book);
+  --fds-type-impact-size: clamp(2.4rem, 2.12rem + 0.75vw, 3.2rem);
+  --fds-type-impact-leading: var(--global-type-line-height-115pc);
 
-  /* Paragraph Line height */
-  --Line-Height-Paragraph-Large: 150%;
-  --Line-Height-Paragraph-Medium: 150%;
-  --Line-Height-Paragraph-Regular: 150%;
-  --Line-Height-Paragraph-Small: 150%;
-  --Line-Height-Paragraph-Tiny: 150%;
+  /* Callout */
+  --fds-type-callout-base: 400 1.8rem/1.4 "SN Skandia";
+  --fds-type-callout-family: var(--global-type-family-skandia);
+  --fds-type-callout-weight: var(--global-type-weight-skandia-book);
+  --fds-type-callout-size: var(--global-type-size-18);
+  --fds-type-callout-leading: var(--global-type-line-height-140pc);
 
-  /* @media (max-width: 1280px) {
-    --Line-Height-Paragraph-Large: 150%;
-    --Line-Height-Paragraph-Medium: 150%;
-    --Line-Height-Paragraph-Regular: 150%;
-    --Line-Height-Paragraph-Small: 150%;
-    --Line-Height-Paragraph-Tiny: 150%;
-  } */
+  /* Body */
+  --fds-type-body-base: 400 1.4rem/1.4 "SN Skandia";
+  --fds-type-body-emphasis: 700 1.4rem/1.4 "SN Skandia";
+  --fds-type-body-link: 400 1.4rem/1.4 "SN Skandia";
+  --fds-type-body-family: var(--global-type-family-skandia);
+  --fds-type-body-weight: var(--global-type-weight-skandia-book);
+  --fds-type-body-weight-emphasis: var(--global-type-weight-skandia-bold);
+  --fds-type-body-size: var(--global-type-size-14);
+  --fds-type-body-leading: var(--global-type-line-height-140pc);
 
-  @media (max-width: 768px) {
-    --Line-Height-Paragraph-Large: 150%;
-    --Line-Height-Paragraph-Medium: 150%;
-    --Line-Height-Paragraph-Regular: 150%;
-    --Line-Height-Paragraph-Small: 150%;
-    --Line-Height-Paragraph-Tiny: 150%;
-  }
+  /* Meta -- smallest text role */
+  --fds-type-meta-base: 400 1.2rem/1.3 "SN Skandia";
+  --fds-type-meta-emphasis: 700 1.2rem/1.3 "SN Skandia";
+  --fds-type-meta-link: 400 1.2rem/1.3 "SN Skandia";
+  --fds-type-meta-family: var(--global-type-family-skandia);
+  --fds-type-meta-weight: var(--global-type-weight-skandia-book);
+  --fds-type-meta-weight-emphasis: var(--global-type-weight-skandia-bold);
+  --fds-type-meta-size: var(--global-type-size-12);
+  --fds-type-meta-leading: var(--global-type-line-height-130pc);
+}
 
-  /* Button Styling */
-  --Font-Size-UI-Controls-Control-Button-Large: 24px;
-  --Font-Size-UI-Controls-Control-Button-Regular: 18px;
-  --Font-Size-UI-Controls-Control-Button-Small: 14px;
+/* ---------------------------------------------------------------------------
+   5. SPACING
+   --------------------------------------------------------------------------- */
+:root {
+  /* Numeric ramp */
+  --global-spacing-2: 0.2rem;
+  --global-spacing-4: 0.4rem;
+  --global-spacing-8: 0.8rem;
+  --global-spacing-16: 1.6rem;
+  --global-spacing-24: 2.4rem;
+  --global-spacing-40: 4rem;
+  --global-spacing-64: 6.4rem;
+  --global-spacing-80: 8rem;
+  --global-spacing-120: 12rem;
 
-  /* @media (max-width: 1280px) {
-    --Font-Size-UI-Controls-Control-Button-Large: 24px;
-    --Font-Size-UI-Controls-Control-Button-Regular: 18px;
-    --Font-Size-UI-Controls-Control-Button-Small: 16px;
-  } */
+  --spacing-2: 0.2rem;
+  --spacing-4: 0.4rem;
+  --spacing-8: 0.8rem;
+  --spacing-10: 1rem;
+  --spacing-16: 1.6rem;
+  --spacing-24: 2.4rem;
+  --spacing-32: 3.2rem;
+  --spacing-40: 4rem;
+  --spacing-48: 4.8rem;
+  --spacing-56: 5.6rem;
+  --spacing-64: 6.4rem;
+  --spacing-80: 8rem;
+  --spacing-100: 10rem;
+  --spacing-120: 12rem;
 
-  @media (max-width: 768px) {
-    --Font-Size-UI-Controls-Control-Button-Large: 20px;
-    --Font-Size-UI-Controls-Control-Button-Regular: 15px;
-    --Font-Size-UI-Controls-Control-Button-Small: 13px;
-  }
+  /* Semantic ramp */
+  --fds-spacing-detail-fine: 0.2rem;
+  --fds-spacing-detail-tight: 0.4rem;
+  --fds-spacing-detail-next: 0.8rem;
+  --fds-spacing-detail-snug: 1.2rem;
+  --fds-spacing-detaul-snug: 1.2rem; /* extraction contains this typo'd name; kept so copied Gymshark CSS still resolves */
+  --fds-spacing-detail-close: 1.6rem;
+  --fds-spacing-detail-near: 2.4rem;
+  --fds-spacing-separator-related: 4rem;
+  --fds-spacing-separator-distant: 6.4rem;
+  --fds-spacing-feature-relaxed: 8rem;
+  --fds-spacing-feature-removed: 12rem;
+  --fds-spacing-utility-layout-margin-min: 1.6rem;
+  --fds-spacing-utility-layout-margin-max: 4rem;
 
-  /* Button Line height */
+  /* Page margins */
+  --base-page-margin: var(--fds-spacing-detail-close);
+  --mobile-padding: var(--fds-spacing-detail-close);
+  --tablet-padding: var(--fds-spacing-detail-close);
 
-  --Line-Height-UI-Controls-Control-Button-Large: 24px;
-  --Line-Height-UI-Controls-Control-Button-Regular: 18px;
-  --Line-Height-UI-Controls-Control-Button-Small: 16px;
+  /* Bare distance names from the extraction */
+  --close: 6.4rem;
+  --standard: 12rem;
+  --distant: 18rem;
+  --basis: 2;
+}
 
-  /* @media (max-width: 1280px) {
-    --Line-Height-UI-Controls-Control-Button-Large: 24px;
-    --Line-Height-UI-Controls-Control-Button-Regular: 18px;
-    --Line-Height-UI-Controls-Control-Button-Small: 16px;
-  } */
+/* ---------------------------------------------------------------------------
+   6. RADIUS
+   Gymshark is a square-cornered system: --fds-radii-angled (0) is the default
+   and the report's radius census is dominated by 0px and 50%.
+   --------------------------------------------------------------------------- */
+:root {
+  --global-radii-0: 0;
+  --global-radii-2: 0.2rem;
+  --global-radii-4: 0.4rem;
+  --global-radii-8: 0.8rem;
+  --global-radii-16: 1.6rem;
+  --global-radii-100pc: 10rem;
 
-  @media (max-width: 768px) {
-    --Line-Height-UI-Controls-Control-Button-Large: 20px;
-    --Line-Height-UI-Controls-Control-Button-Regular: 15px;
-    --Line-Height-UI-Controls-Control-Button-Small: 16px;
-  }
+  --fds-radii-angled: 0;
+  --fds-radii-softened: 0.4rem;
+  --fds-radii-relaxed: 10rem;
 
-  /* Spacing Variables */
-  --Spacing-Container-xxs: 6px;
-  --Spacing-Container-xs: 8px;
-  --Spacing-Container-sm: 12px;
-  --Spacing-Container-md: 16px;
-  --Spacing-Container-lg: 24px;
-  --Spacing-Container-xl: 32px;
-  --Spacing-Container-xxl: 48px;
+  --rounded-corners-small: 2px;
+  --rounded-corners-standard: 4px;
+  --rounded-corners-large: 8px;
+  --rounded-corners-button: 5rem;
+}
 
-  --Spacing-Section-Vertical-Padding: 64px;
-  --Spacing-Section-Horizontal-Padding: 128px;
+/* ---------------------------------------------------------------------------
+   7. ELEVATION
+   --------------------------------------------------------------------------- */
+:root {
+  --box-shadow-small: 0 4px 15px 0 rgba(0, 0, 0, 0.1);
+  --box-shadow-large: 0 4px 60px 0 rgba(0, 0, 0, 0.1);
+  --box-shadow-top: 0 -4px 15px 0 rgba(0, 0, 0, 0.1);
+}
 
-  @media (max-width: 1200px) {
-  --Spacing-Container-xxs: 6px;
-  --Spacing-Container-xs: 6px;
-  --Spacing-Container-sm: 8px;
-  --Spacing-Container-md: 12px;
-  --Spacing-Container-lg: 20px;
-  --Spacing-Container-xl: 24px;
-  --Spacing-Container-xxl: 40px;
+/* ---------------------------------------------------------------------------
+   8. BORDER WIDTH, SIZE AND LAYOUT
+   --------------------------------------------------------------------------- */
+:root {
+  --global-border-width-05: 0.05rem;
+  --global-border-width-1: 0.1rem;
+  --global-border-width-2: 0.2rem;
+  --fds-border-width-fine: 0.1rem;
+  --fds-border-width-regular: 0.2rem;
 
-    --Spacing-Section-Vertical-Padding: 24px;
-    --Spacing-Section-Horizontal-Padding: 32px;
-  }
+  --fds-size-container-max-width: 140rem;
+  --fds-size-text-max-width: 90rem;
+  --content-max-width: 3000px;
 
-  @media (max-width: 600px) {
-    --Spacing-Container-xxs: 4px;
-    --Spacing-Container-xs: 6px;
-    --Spacing-Container-sm: 8px;
-    --Spacing-Container-md: 12px;
-    --Spacing-Container-lg: 16px;
-    --Spacing-Container-xl: 24px;
-    --Spacing-Container-xxl: 32px;
+  --banner-aspect-ratio: 4/3;
+  --banner-desktop-aspect-ratio: 4/3;
 
-    --Spacing-Section-Vertical-Padding: 36px;
-    --Spacing-Section-Horizontal-Padding: 16px;
-  }
+  --nav-height: 3.5rem;
+  --menu-height: 7rem;
+  --nav-and-menu-height-desktop: 10.5rem;
+  --sticky-seo-header: 5.2rem;
+  --sticky-seo-header-with-gender: 6.9rem;
+  --usp-grouped-height: 5.8rem;
+  --usp-revolving-height: 4.8rem;
+  --max-height: 13.2rem;
+  --thumbnailWidth: 6.4rem;
+}
 
-  /* Color Variables */
-  --Content-Base-main: #1f2937;
-  --Content-Base-base: #4b5563;
-  --Content-Base-subtle: #9ca3af;
-  --Content-Base-highlight: #312e81;
-  --Content-Base-disabled: #f3f4f6;
+/* ---------------------------------------------------------------------------
+   9. BREAKPOINTS (reference only)
+   Media query conditions cannot read custom properties, so these cannot be
+   tokenised -- they are recorded here so hand-written queries stay aligned
+   with the extraction's breakpoint census.
 
-  /* Color Inverted Variables */
-  --Content-Inverted-main: #f3f4f6;
-  --Content-Inverted-base: #d1d5db;
-  --Content-Inverted-subtle: #6b7280;
-  --Content-Inverted-highlight: #eef2ff;
-  --Content-Inverted-disabled: #1f2937;
+     1024px  primary desktop boundary  (712 queries)
+      768px  tablet boundary           (303 queries)
+     1440px  wide desktop              ( 44 queries)
+     1223px  mega-menu boundary        ( 36 queries)
+     1920px  ultrawide                 ( 18 queries)
+      500px  small phone               (  8 queries)
+   --------------------------------------------------------------------------- */
 
-  /* Border Color Variables */
-  --Border-Base-main: #d1d5db;
-  --Border-Base-subtle: #e5e7eb;
-  --Border-Base-highlight: #f3f4f6;
-  --Border-Base-disabled: #4b5563;
+/* ---------------------------------------------------------------------------
+   10. DAWN BRIDGE
+   Dawn's own primitives, re-pointed at the tokens above so the stock theme
+   picks up Gymshark typography without every rule being rewritten.
 
-  /* Transitions */
+   NOTE: colour is deliberately NOT bridged here. Dawn resolves colour through
+   RGB triplets (rgba(var(--color-foreground), .75)) fed by the colour schemes
+   in config/settings_data.json, and those schemes have been set to the
+   Gymshark palette. Overriding --color-* here instead would recolour the
+   storefront but leave the theme editor showing the wrong swatches.
+   --------------------------------------------------------------------------- */
+:root {
+  --font-body-family: var(--fds-type-body-family);
+  --font-body-style: normal;
+  --font-body-weight: var(--global-type-weight-skandia-book);
+  --font-body-weight-bold: var(--global-type-weight-skandia-bold);
+
+  --font-heading-family: var(--fds-type-title-family);
+  --font-heading-style: normal;
+  --font-heading-weight: var(--global-type-weight-plaak-heavyweight);
+
+  /* Kept as aliases so any existing markup referencing them keeps working. */
+  --font-family-Body: var(--fds-type-body-family);
+  --font-family-Body-Bold: var(--fds-type-body-family);
+  --font-family-Title: var(--fds-type-title-family);
+  --font-family-Heading: var(--fds-type-heading-family);
+  --font-family-Control: var(--fds-type-body-family);
+
+  --page-width: var(--fds-size-container-max-width);
+  --brand-color-1: var(--fds-color-surface-inverse);
+}
+
+/* Dawn hard-codes a body letter-spacing of 0.06rem in theme.liquid; Gymshark
+   renders body copy at `normal`. */
+body {
+  color: rgb(var(--color-foreground));
+  font-family: var(--fds-type-body-family);
+  font-size: var(--fds-type-body-size);
+  font-weight: var(--fds-type-body-weight);
+  line-height: var(--fds-type-body-leading);
+  letter-spacing: var(--global-type-letterspacing-0pc);
+  background-color: rgb(var(--color-background));
+}
+
+/* ---------------------------------------------------------------------------
+   10b. LEGACY COMPATIBILITY
+   The previous token layer used PascalCase names that a few sections still
+   reference (sections/xcustom-elements.liquid). They are kept as aliases onto
+   the FDS roles, so that markup keeps working AND picks up Gymshark values
+   automatically. Prefer the --fds-* tokens in new work; these can be deleted
+   once the last consumer is migrated.
+   --------------------------------------------------------------------------- */
+:root {
+  --Font-Size-Paragraph-Small: var(--fds-type-meta-size);
+  --Line-Height-Paragraph-Small: var(--fds-type-meta-leading);
+  --Font-Size-Paragraph-Regular: var(--fds-type-body-size);
+  --Line-Height-Paragraph-Regular: var(--fds-type-body-leading);
+  --Font-Size-Paragraph-Medium: var(--global-type-size-16);
+  --Line-Height-Paragraph-Medium: var(--global-type-line-height-140pc);
+  --Font-Size-Paragraph-Large: var(--fds-type-callout-size);
+  --Line-Height-Paragraph-Large: var(--fds-type-callout-leading);
+
+  --Font-Size-Heading-H1: var(--fds-type-display-size);
+  --Line-Height-Heading-H1: var(--fds-type-display-leading);
+  --Font-Size-Heading-H2: var(--fds-type-title-size);
+  --Line-Height-Heading-H2: var(--fds-type-title-leading);
+  --Font-Size-Heading-H3: var(--global-type-size-24);
+  --Line-Height-Heading-H3: var(--fds-type-title-leading);
+  --Font-Size-Heading-H4: var(--fds-type-heading-size);
+  --Line-Height-Heading-H4: var(--fds-type-heading-leading);
+  --Font-Size-Heading-H5: var(--global-type-size-16);
+  --Line-Height-Heading-H5: var(--fds-type-heading-leading);
+
+  --Spacing-Container-xxs: var(--global-spacing-2);
+  --Spacing-Container-xs: var(--global-spacing-4);
+  --Spacing-Container-sm: var(--global-spacing-8);
+  --Spacing-Container-md: var(--fds-spacing-detail-snug);
+  --Spacing-Container-lg: var(--global-spacing-16);
+  --Spacing-Container-xl: var(--global-spacing-24);
+  --Spacing-Container-xxl: var(--global-spacing-40);
+  --Spacing-Section-Vertical-Padding: var(--fds-spacing-separator-distant);
+  --Spacing-Section-Horizontal-Padding: var(--fds-spacing-utility-layout-margin-max);
+
+  /* Motion — generic, carried over unchanged */
   --transition-fast: 0.3s;
   --transition-medium: 0.4s;
   --transition-slow: 0.5s;
-
-  /* Easing Modes */
   --ease: ease;
   --ease-in: ease-in;
   --ease-out: ease-out;
@@ -280,98 +568,68 @@
   --linear: linear;
   --cubic-bezier-smooth: cubic-bezier(0.25, 0.1, 0.25, 1);
   --cubic-bezier-bounce: cubic-bezier(0.68, -0.55, 0.27, 1.55);
-
-  /* Complete Transition Variants */
   --transition-fast-ease: var(--transition-fast) var(--ease);
-  --transition-fast-ease-in: var(--transition-fast) var(--ease-in);
   --transition-fast-ease-out: var(--transition-fast) var(--ease-out);
-  --transition-fast-ease-in-out: var(--transition-fast) var(--ease-in-out);
-  --transition-fast-linear: var(--transition-fast) var(--linear);
   --transition-fast-smooth: var(--transition-fast) var(--cubic-bezier-smooth);
-  --transition-fast-bounce: var(--transition-fast) var(--cubic-bezier-bounce);
-
   --transition-medium-ease: var(--transition-medium) var(--ease);
-  --transition-medium-ease-in: var(--transition-medium) var(--ease-in);
   --transition-medium-ease-out: var(--transition-medium) var(--ease-out);
-  --transition-medium-ease-in-out: var(--transition-medium) var(--ease-in-out);
-  --transition-medium-linear: var(--transition-medium) var(--linear);
-  --transition-medium-smooth: var(--transition-medium)
-    var(--cubic-bezier-smooth);
-  --transition-medium-bounce: var(--transition-medium)
-    var(--cubic-bezier-bounce);
-
+  --transition-medium-smooth: var(--transition-medium) var(--cubic-bezier-smooth);
   --transition-slow-ease: var(--transition-slow) var(--ease);
-  --transition-slow-ease-in: var(--transition-slow) var(--ease-in);
   --transition-slow-ease-out: var(--transition-slow) var(--ease-out);
-  --transition-slow-ease-in-out: var(--transition-slow) var(--ease-in-out);
-  --transition-slow-linear: var(--transition-slow) var(--linear);
   --transition-slow-smooth: var(--transition-slow) var(--cubic-bezier-smooth);
-  --transition-slow-bounce: var(--transition-slow) var(--cubic-bezier-bounce);
-
-  /* Border border-radius............................... */
-  --rounded-3xl: 24px;
-}
-body {
-  color: #112F15;
-}
-body * {
-  color: inherit;
-}
-h1, .h1 {
-  font-size: var(--Font-Size-Heading-H1);
-  line-height: var(--Line-Height-Heading-H1);
-  font-family: var(--font-family-Title);
-  /* text-transform: uppercase; */
 }
 
-h2, .h2 {
-  font-size: var(--Font-Size-Heading-H2);
-  line-height: var(--Line-Height-Heading-H2);
-  font-family: var(--font-family-Title);
- 
-  /* text-transform: uppercase; */
-}
-
-h3, .h3 {
-  font-size: var(--Font-Size-Heading-H3);
-  line-height: var(--Line-Height-Heading-H3);
-  font-family: var(--font-family-Title);
-  /* text-transform: uppercase; */
-}
-
-h4, .h4 {
-  font-size: var(--Font-Size-Heading-H4);
-  line-height: var(--Line-Height-Heading-H4);
-  font-family: var(--font-family-Title);
-}
-
-h5, .h5 {
-  font-size: var(--Font-Size-Heading-H4);
-  line-height: var(--Line-Height-Heading-H4);
-  font-family: var(--font-family-Title);
-  /* text-transform: uppercase; */
-}
-
-h6, .h6 {
-  font-size: var(--Font-Size-Heading-H4);
-  line-height: var(--Line-Height-Heading-H4);
-  font-family: var(--font-family-Title);
-  /* text-transform: uppercase; */
+/* ---------------------------------------------------------------------------
+   11. TYPOGRAPHIC ROLES
+   h1-h5 / .h0-.h5 are mapped to the FDS ramp in base.css (single source of
+   truth for the heading scale). Only the roles Dawn does not style live here.
+   --------------------------------------------------------------------------- */
+h6,
+.h6 {
+  font-family: var(--fds-type-heading-family);
+  font-weight: var(--fds-type-heading-weight);
+  font-size: var(--global-type-size-16);
+  line-height: var(--fds-type-heading-leading);
+  letter-spacing: var(--global-type-letterspacing-0pc);
+  color: rgb(var(--color-foreground));
 }
 
 p,
 a,
 label {
   text-decoration: unset;
-  font-size: var(--Font-Size-Paragraph-Regular);
-  line-height: var(--Line-Height-Paragraph-Regular);
-  /* font-size: var(--Font-Size-Paragraph-Medium);
-  line-height: var(--Line-Height-Paragraph-Medium); */
-  letter-spacing: 0px;
+  font-family: var(--fds-type-body-family);
+  font-size: var(--fds-type-body-size);
+  line-height: var(--fds-type-body-leading);
+  letter-spacing: var(--global-type-letterspacing-0pc);
 }
+
+label {
+  color: var(--fds-color-text-muted);
+}
+
+small,
+.--meta {
+  font-family: var(--fds-type-meta-family);
+  font-size: var(--fds-type-meta-size);
+  line-height: var(--fds-type-meta-leading);
+}
+
+.--callout {
+  font-family: var(--fds-type-callout-family);
+  font-size: var(--fds-type-callout-size);
+  line-height: var(--fds-type-callout-leading);
+}
+
+.--impact {
+  font-family: var(--fds-type-impact-family);
+  font-weight: var(--fds-type-impact-weight);
+  font-size: var(--fds-type-impact-size);
+  line-height: var(--fds-type-impact-leading);
+}
+
 .subtitle {
-    /* letter-spacing: 1px; */
-    letter-spacing: 0px;
+  letter-spacing: var(--global-type-letterspacing-0pc);
 }
 
 button,
@@ -397,12 +655,15 @@ select {
 .button {
     min-height: unset;
     min-width: unset;
-    border-radius: 7px;
-    background: #112F15;
-    font-size: 14px;
+    border-radius: var(--fds-radii-angled);
+    background: var(--fds-color-surface-inverse);
+    font-size: var(--global-type-size-14);
     line-height: 1;
     padding: 15px 25px;
-    text-transform: capitalize;
+    font-family: var(--fds-type-body-family);
+    font-weight: var(--global-type-weight-skandia-bold);
+    text-transform: var(--global-type-case-upper);
+    letter-spacing: var(--global-type-letterspacing-2pc);
     transition: 0.5s ease;
     @media(max-width:768px){
       padding:10px 20px;
@@ -412,28 +673,28 @@ select {
     padding-right: 40px;
 }
 .button.--primary-button:hover {
-    background: #112f15;
+    background: var(--fds-color-surface-inverse);
 }
 
 .button.--secondary-button {
   padding-right: 40px;
-  background: rgba(17, 47, 21, 0.50);
+  background: var(--fds-color-overlay-on-light70);
 }
 .button.--secondary-button:hover {
  
-  background: #112F15;
+  background: var(--fds-color-surface-inverse);
 }
 .button.--tertiary-button {
   padding-right: 40px;
-  background: #EBF1B1;
-  color: #112F15;
+  background: var(--global-color-brand-ice);
+  color: var(--fds-color-text-default);
 }
 
 .button.--outline-button {
     padding-right: 25px;
-    background: #112f1538;
-    border-radius: 9.6px;
-    border: 1.2px solid rgba(244, 239, 230, 0.25);
+    background: var(--fds-color-overlay-on-light15);
+    border-radius: var(--fds-radii-angled);
+    border: var(--fds-border-width-fine) solid var(--fds-color-overlay-on-dark);
 }
 .button.--primary-button::before ,
 .button.--secondary-button::before,
@@ -446,7 +707,7 @@ select {
   transform: translateY(-50%);
   width: 6px;
   height: 10px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='10' viewBox='0 0 6 10' fill='none'%3E%3Cpath d='M0.5 9.5L5 5L0.5 0.5' stroke='white' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='10' viewBox='0 0 6 10' fill='none'%3E%3Cpath d='M0.5 9.5L5 5L0.5 0.5' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;
@@ -458,7 +719,7 @@ select {
   right: 20px;
   width: 16px;
   height: 16px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17' height='17' viewBox='0 0 17 17' fill='none'%3E%3Cpath d='M3.1499 8.40117H13.6499M9.4499 12.6012L13.6499 8.40117L9.4499 4.20117' stroke='%23112F15' stroke-width='1.575' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17' height='17' viewBox='0 0 17 17' fill='none'%3E%3Cpath d='M3.1499 8.40117H13.6499M9.4499 12.6012L13.6499 8.40117L9.4499 4.20117' stroke='%230d1012' stroke-width='1.575' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
  
 }
 
@@ -532,9 +793,9 @@ a {
 
 }
 span.swiper-pagination-bullet {
-    background: #112F15;
-    width: 13px;
-    height: 13px;
+    background: var(--fds-color-surface-inverse);
+    width: 8px;
+    height: 8px;
     margin: 0!important;
 }
 /* Swiper Reset */
@@ -544,13 +805,13 @@ span.swiper-pagination-bullet {
                       justify-content: center;
                       align-items: center;
                       gap: 10px;
-                      border-radius: 7px;
-                      background: #EBF1B1;
+                      border-radius: var(--fds-radii-angled);
+                      background: var(--global-color-brand-ice);
                       max-width: max-content;
                       margin: 0;
-                      color: #112F15;
+                      color: var(--fds-color-text-default);
                       text-align: center;
-                      font-size: 14px;
+                      font-size: var(--global-type-size-14);
                       font-weight: 500;
                       line-height: 1.3;
                       text-transform: capitalize; */
@@ -561,23 +822,23 @@ span.swiper-pagination-bullet {
             justify-content: center;
             align-items: center;
             gap: 10px;
-            border-radius: 7px;
-            background: #EBF1B1;
+            border-radius: var(--fds-radii-angled);
+            background: var(--global-color-brand-ice);
             max-width: max-content;
             margin: 0;
-            color: #112F15;
+            color: var(--fds-color-text-default);
             text-align: center;
-            font-size: 14px;
+            font-size: var(--global-type-size-14);
             font-weight: 500;
             line-height: 1.3;
             text-transform: capitalize;
             margin: 0;
         }
         .--caption.style_2 {
-          color: #EBF1B1;
-          font-size: 14px;
+          color: var(--global-color-brand-electric);
+          font-size: var(--global-type-size-14);
           font-weight: 500;
-          line-height: 22.012px;
+          line-height: var(--global-type-line-height-140pc);
           text-transform: capitalize;
           display: flex;
           align-items: center;
@@ -599,7 +860,7 @@ span.swiper-pagination-bullet {
 }
 .--image-wrapper svg{
   display: block;
-  border: 1px solid #000;
+  border: var(--fds-border-width-fine) solid var(--fds-color-border-strong);
 }
 .--nav-icon {
     background: var(--brand-color-1);
