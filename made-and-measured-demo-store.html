@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amaze Price Builder — Demo Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1b2430;--ink-soft:#4a5765;--ink-faint:#818c99;
+    --paper:#f1f2ec;--card:#ffffff;--rule:#dadfd4;--rule-soft:#e7eae1;
+    --brand:#23405e;--signal:#9a6b18;--signal-tint:#f6efdf;
+    --c1:#3f5a86;--c2:#2f6d6a;--c3:#9a6b18;--c4:#7a4a6b;--c5:#4f6b3a;
+    --maxw:1200px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none;cursor:pointer}
+  button{font-family:inherit;cursor:pointer}
+  img{max-width:100%;display:block}
+  .mono{font-family:"IBM Plex Mono",monospace}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  :focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+
+  .announce{background:var(--ink);color:#eef0ea;font-size:13px;text-align:center;padding:9px 16px}
+  .announce b{color:#fff}
+
+  header{position:sticky;top:0;z-index:40;background:rgba(241,242,236,.92);backdrop-filter:saturate(1.1) blur(8px);border-bottom:1px solid var(--rule)}
+  .bar{display:flex;align-items:center;gap:26px;height:66px}
+  .logo{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:20px;letter-spacing:-.02em;display:flex;align-items:center;gap:9px}
+  .logo .mark{width:22px;height:22px;border:2px solid var(--ink);border-radius:3px;position:relative}
+  .logo .mark::after{content:"";position:absolute;inset:4px 4px auto auto;width:8px;height:8px;background:var(--signal)}
+  nav.main{display:flex;gap:20px;font-size:14.5px;color:var(--ink-soft);margin-left:6px}
+  nav.main a:hover,nav.main a.on{color:var(--ink)}
+  .bar .spacer{margin-left:auto}
+  .cart-btn{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--ink-soft);border:1px solid var(--rule);background:var(--card);padding:8px 13px;border-radius:3px;position:relative}
+  .cart-btn:hover{border-color:var(--ink-faint)}
+  .cart-count{font-family:"IBM Plex Mono",monospace;font-size:11px;background:var(--signal);color:#fff;border-radius:20px;min-width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;padding:0 5px}
+  @media (max-width:820px){nav.main{display:none}}
+
+  .page{display:none}
+  .page.active{display:block}
+
+  /* hero */
+  .hero{padding:56px 0 60px}
+  .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+  @media (max-width:940px){.hero-grid{grid-template-columns:1fr;gap:32px}}
+  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--signal);margin-bottom:18px}
+  .hero h1{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:clamp(2.5rem,6vw,4.1rem);line-height:1;letter-spacing:-.025em;margin:0 0 20px}
+  .hero p.lede{font-size:1.14rem;color:var(--ink-soft);max-width:44ch;margin:0 0 28px}
+  .btn{display:inline-flex;align-items:center;gap:9px;font-size:15px;font-weight:500;padding:13px 22px;border-radius:3px;border:1px solid transparent}
+  .btn-primary{background:var(--ink);color:#fff}.btn-primary:hover{background:#2a3a4d}
+  .btn-ghost{background:transparent;color:var(--ink);border-color:var(--rule)}.btn-ghost:hover{border-color:var(--ink)}
+  .btn-block{width:100%;justify-content:center}
+  .hero-cta{display:flex;gap:14px;flex-wrap:wrap}
+  .hero-vis{background:var(--card);border:1px solid var(--rule);border-radius:8px;aspect-ratio:1/1;position:relative;overflow:hidden}
+  .hero-vis .grid-motif{position:absolute;inset:0;background-image:linear-gradient(rgba(35,64,94,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(35,64,94,.07) 1px,transparent 1px);background-size:26px 26px}
+  .hero-vis .rect{position:absolute;inset:70px;border:2px solid var(--brand);border-radius:3px}
+  .hero-vis .dimx{position:absolute;left:70px;right:70px;top:44px;height:1px;background:var(--brand);opacity:.55}
+  .hero-vis .dimx::before,.hero-vis .dimx::after{content:"";position:absolute;top:-4px;width:1px;height:9px;background:var(--brand)}
+  .hero-vis .dimx::before{left:0}.hero-vis .dimx::after{right:0}
+  .hero-vis .dimy{position:absolute;top:70px;bottom:70px;left:44px;width:1px;background:var(--brand);opacity:.55}
+  .hero-vis .dimy::before,.hero-vis .dimy::after{content:"";position:absolute;left:-4px;width:9px;height:1px;background:var(--brand)}
+  .hero-vis .dimy::before{top:0}.hero-vis .dimy::after{bottom:0}
+  .hero-vis .lblw,.hero-vis .lblh{position:absolute;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--brand)}
+  .hero-vis .lblw{top:26px;left:50%;transform:translateX(-50%)}
+  .hero-vis .lblh{left:22px;top:50%;transform:translateY(-50%) rotate(-90deg)}
+
+  .badge-pill{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.04em;color:var(--brand);background:#eaf0f6;border:1px solid #cfdceb;padding:6px 13px;border-radius:20px;margin-bottom:22px}
+  .hero h1 .accent{color:var(--signal)}
+  .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+  .chip{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--ink-soft);background:var(--card);border:1px solid var(--rule);padding:7px 12px;border-radius:4px}
+  .chip svg{color:var(--c5);flex:none}
+  .hero-orbit{display:flex;align-items:center;justify-content:center}
+  .orbit{position:relative;width:100%;max-width:410px;aspect-ratio:1/1;margin:0 auto}
+  .orbit-ring{position:absolute;inset:44px;border:2px dashed var(--rule);border-radius:50%}
+  .orbit-node{position:absolute;display:flex;flex-direction:column;align-items:center;gap:7px;width:86px;text-align:center;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.02em;color:var(--ink-soft)}
+  .orbit-node .ic{width:42px;height:42px;border-radius:50%;background:var(--card);border:1px solid var(--rule);display:flex;align-items:center;justify-content:center;color:var(--brand)}
+  .n-top{top:0;left:50%;transform:translateX(-50%)}
+  .n-right{right:0;top:50%;transform:translateY(-50%)}
+  .n-bottom{bottom:0;left:50%;transform:translateX(-50%)}
+  .n-left{left:0;top:50%;transform:translateY(-50%)}
+  .orbit-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:58%;background:var(--card);border:1px solid var(--rule);border-radius:9px;box-shadow:0 10px 28px -16px rgba(27,36,48,.45);padding:14px 15px}
+  .oc-live{font-family:"IBM Plex Mono",monospace;font-size:9px;color:var(--c1);display:flex;align-items:center;gap:6px;margin-bottom:9px}
+  .oc-live .d{width:6px;height:6px;border-radius:50%;background:var(--c1)}
+  .oc-row{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-soft);padding:2px 0}
+  .oc-row b{color:var(--ink);font-family:"IBM Plex Mono",monospace;font-weight:500}
+  .oc-total{display:flex;justify-content:space-between;align-items:baseline;border-top:1px dashed var(--rule);margin-top:9px;padding-top:9px}
+  .oc-total span{font-size:10px;color:var(--ink-faint)}
+  .oc-total b{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:1.15rem;color:var(--ink)}
+  @media (max-width:940px){.orbit{max-width:340px;margin-top:8px}}
+  .orbit{max-width:470px}
+  .orbit-ring{inset:16px}
+  .n-bottom{flex-direction:column-reverse}
+  .odots{position:absolute;width:66px;height:46px;background-image:radial-gradient(var(--rule) 1.4px,transparent 1.4px);background-size:11px 11px;opacity:.85;pointer-events:none}
+  .odots.tr{top:2px;right:-4px}
+  .odots.bl{bottom:2px;left:-4px}
+  .spark{position:absolute;color:var(--signal);font-size:17px;font-weight:700;line-height:1}
+  .spark.s1{top:46px;left:2px}.spark.s2{bottom:58px;right:10px}
+  .appwin{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:76%;background:var(--card);border:1px solid var(--rule);border-radius:11px;box-shadow:0 18px 44px -20px rgba(27,36,48,.5);overflow:hidden;display:flex}
+  .aw-side{width:40%;background:#16324a;padding:12px 9px}
+  .aw-brand{display:flex;align-items:center;gap:6px;font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:11px;color:#fff;margin-bottom:12px}
+  .aw-brand .lg{width:16px;height:16px;border-radius:4px;background:var(--signal);color:#16324a;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+  .aw-nav{display:flex;flex-direction:column;gap:2px}
+  .aw-item{font-size:9.5px;padding:5px 7px;border-radius:4px;color:#9fb0c2}
+  .aw-item.on{background:rgba(255,255,255,.12);color:#fff}
+  .aw-main{flex:1;padding:12px}
+  .aw-top{display:flex;justify-content:space-between;align-items:center;font-size:9.5px;color:var(--ink-faint);margin-bottom:9px}
+  .aw-add{color:var(--brand);font-weight:600}
+  .aw-card{border:1px solid var(--rule-soft);border-radius:8px;padding:11px 12px;background:#fcfcfa}
+  .awc-title{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:12px;margin-bottom:8px}
+  .awc-row{display:flex;justify-content:space-between;font-size:10px;color:var(--ink-soft);padding:2px 0}
+  .awc-row b{color:var(--ink);font-family:"IBM Plex Mono",monospace;font-weight:500}
+  .awc-total{display:flex;justify-content:space-between;align-items:baseline;border-top:1px dashed var(--rule);margin-top:7px;padding-top:7px}
+  .awc-total span{font-size:9.5px;color:var(--ink-faint)}
+  .awc-total b{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:1.05rem;color:var(--ink)}
+  .awc-btn{margin-top:10px;background:var(--brand);color:#fff;text-align:center;font-size:10px;font-weight:600;padding:8px;border-radius:5px}
+  @media (max-width:940px){.orbit{max-width:350px}}
+  .strip{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);background:var(--card)}
+  .steps3{display:grid;grid-template-columns:repeat(3,1fr)}
+  @media (max-width:760px){.steps3{grid-template-columns:1fr}}
+  .step{padding:30px 28px;border-right:1px solid var(--rule-soft)}
+  .step:last-child{border-right:0}
+  .step .n{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--signal);margin-bottom:10px}
+  .step h4{font-family:"Space Grotesk",sans-serif;font-size:1.05rem;margin:0 0 6px;font-weight:600}
+  .step p{margin:0;color:var(--ink-soft);font-size:14.5px}
+
+  .sec{padding:64px 0}
+  .sec-top{margin-bottom:28px}
+  .sec-top h2{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:2rem;letter-spacing:-.02em;margin:0}
+  .sec-top p{margin:6px 0 0;color:var(--ink-soft)}
+
+  .pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  @media (max-width:900px){.pgrid{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:560px){.pgrid{grid-template-columns:1fr}}
+  .pcard{background:var(--card);border:1px solid var(--rule);border-radius:6px;overflow:hidden;display:flex;flex-direction:column;transition:transform .18s,box-shadow .18s;text-align:left}
+  .pcard:hover{transform:translateY(-3px);box-shadow:0 10px 24px -14px rgba(27,36,48,.35)}
+  .thumb{aspect-ratio:4/3;position:relative;border-bottom:1px solid var(--rule-soft)}
+  .thumb .gm{position:absolute;inset:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:22px 22px}
+  .thumb .badge{position:absolute;right:14px;top:14px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:#fff;background:var(--hue);padding:3px 8px;border-radius:2px}
+  .thumb .dim{position:absolute;left:16px;bottom:14px;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--hue);background:#fff;border:1px solid var(--rule);padding:3px 8px;border-radius:2px}
+  .pbody{padding:16px 18px 18px;display:flex;flex-direction:column;gap:6px;flex:1}
+  .pbody h3{font-family:"Space Grotesk",sans-serif;font-size:1.08rem;margin:0;font-weight:600}
+  .pbody .desc{font-size:13.5px;color:var(--ink-soft);margin:0;flex:1}
+  .prow{display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:12px;border-top:1px solid var(--rule-soft)}
+  .prow .from{font-size:13px;color:var(--ink-faint)}
+  .prow .from b{font-family:"Space Grotesk",sans-serif;color:var(--ink);font-size:1.05rem;font-weight:600}
+  .prow .go{font-size:13px;color:var(--hue);font-weight:500}
+
+  .feature{background:var(--ink);color:#e9ecf1;border-radius:8px;padding:44px;display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:center}
+  @media (max-width:760px){.feature{grid-template-columns:1fr;padding:30px 24px}}
+  .feature h2{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:1.9rem;letter-spacing:-.02em;margin:0 0 12px;color:#fff}
+  .feature p{margin:0 0 20px;color:#b7c0cc;max-width:46ch}
+  .feature .btn-primary{background:#fff;color:var(--ink)}
+  .formula-demo{font-family:"IBM Plex Mono",monospace;font-size:12.5px;line-height:1.9;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:18px}
+  .formula-demo .v{color:#8fb8ff}.formula-demo .f{color:#e5c07b}.formula-demo .c{color:#7c8aa0}
+
+  /* PDP */
+  .crumb{font-size:13px;color:var(--ink-faint);padding:22px 0 0}
+  .crumb a:hover{color:var(--ink)}
+  .pdp{display:grid;grid-template-columns:1fr 1fr;gap:44px;padding:22px 0 70px;align-items:start}
+  @media (max-width:860px){.pdp{grid-template-columns:1fr;gap:28px}}
+  .pdp-vis{position:sticky;top:90px}
+  @media (max-width:860px){.pdp-vis{position:static}}
+  .pdp-hero{aspect-ratio:1/1;border:1px solid var(--rule);border-radius:8px;position:relative;overflow:hidden;background:var(--card)}
+  .pdp-hero .gm{position:absolute;inset:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:28px 28px}
+  .pdp-hero .rect{position:absolute;inset:64px;border:2px solid var(--hue);border-radius:3px}
+  .pdp-hero .badge{position:absolute;left:18px;top:18px;font-family:"IBM Plex Mono",monospace;font-size:11px;color:#fff;background:var(--hue);padding:4px 9px;border-radius:2px}
+  .pdp-desc{margin-top:18px;color:var(--ink-soft);font-size:14.5px}
+  .pdp-desc ul{margin:12px 0 0;padding-left:18px}
+  .pdp-desc li{margin:4px 0}
+  .pdp-logic{margin-top:18px;background:var(--signal-tint);border:1px solid #eaddc0;border-radius:6px;padding:14px 16px}
+  .pdp-logic .pl-h{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.03em;color:var(--signal);display:block;margin-bottom:6px}
+  .pdp-logic p{margin:0;font-size:13.5px;color:var(--ink-soft)}
+
+  .pdp-type{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--hue);margin-bottom:8px}
+  .pdp h1{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:2rem;letter-spacing:-.02em;margin:0 0 6px}
+  .pdp .rate{color:var(--ink-faint);font-size:14px;margin-bottom:22px}
+  .calc-card{background:var(--card);border:1px solid var(--rule);border-radius:8px;overflow:hidden}
+  .cc-body{padding:22px}
+  .cc-live{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--hue);display:inline-flex;align-items:center;gap:7px;margin-bottom:16px}
+  .cc-live .pulse{width:7px;height:7px;border-radius:50%;background:var(--hue);position:relative}
+  .cc-live .pulse::after{content:"";position:absolute;inset:0;border-radius:50%;background:var(--hue);animation:pulse 1.8s ease-out infinite}
+  @keyframes pulse{0%{transform:scale(1);opacity:.5}100%{transform:scale(2.6);opacity:0}}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:12px;color:var(--ink-faint);margin-bottom:5px;font-family:"IBM Plex Mono",monospace}
+  .field input[type=number],.field select{width:100%;padding:10px 12px;border:1px solid var(--rule);border-radius:3px;font-family:inherit;font-size:14px;background:#fcfcfa;color:var(--ink)}
+  .field input:focus,.field select:focus{border-color:var(--brand);outline:none}
+  .frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .chk{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--ink-soft);margin:2px 0 12px;cursor:pointer}
+  .chk input{width:16px;height:16px;accent-color:var(--brand)}
+  .cc-total{display:flex;justify-content:space-between;align-items:flex-end;border-top:1px dashed var(--rule);margin-top:14px;padding-top:16px}
+  .cc-total .lbl{font-size:13px;color:var(--ink-faint)}
+  .cc-total .amt{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:2.1rem;letter-spacing:-.02em}
+  .cc-note{font-size:11.5px;color:var(--ink-faint);margin:8px 0 16px;font-family:"IBM Plex Mono",monospace}
+  .powered{text-align:center;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-faint);padding:11px;border-top:1px solid var(--rule-soft);background:#fafbf8}
+  .powered b{color:var(--signal)}
+  .example-link{font-size:12.5px;color:var(--hue);margin-top:12px;display:inline-block;border-bottom:1px solid transparent}
+  .example-link:hover{border-bottom-color:var(--hue)}
+
+  /* cart */
+  .cart-wrap{padding:40px 0 80px;max-width:760px}
+  .cart-wrap h1{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:1.9rem;margin:0 0 22px;letter-spacing:-.02em}
+  .cart-item{background:var(--card);border:1px solid var(--rule);border-radius:6px;padding:16px 18px;display:flex;justify-content:space-between;gap:16px;margin-bottom:12px}
+  .cart-item .ci-name{font-family:"Space Grotesk",sans-serif;font-weight:600}
+  .cart-item .ci-spec{font-size:12.5px;color:var(--ink-faint);font-family:"IBM Plex Mono",monospace;margin-top:4px}
+  .cart-item .ci-price{font-family:"Space Grotesk",sans-serif;font-weight:600;white-space:nowrap}
+  .ci-remove{font-size:12px;color:#b04a5a;margin-top:6px;display:inline-block}
+  .cart-empty{color:var(--ink-soft);background:var(--card);border:1px dashed var(--rule);border-radius:6px;padding:40px;text-align:center}
+  .cart-total{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--rule);margin-top:16px;padding-top:18px}
+  .cart-total .amt{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:1.6rem}
+
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 20px;border-radius:4px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:60}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  footer{border-top:1px solid var(--rule);margin-top:20px;padding:48px 0 40px;background:var(--card)}
+  .fgrid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:32px}
+  @media (max-width:760px){.fgrid{grid-template-columns:1fr 1fr}}
+  .fcol h5{font-family:"Space Grotesk",sans-serif;font-size:13px;margin:0 0 12px;font-weight:600}
+  .fcol a{display:block;color:var(--ink-soft);font-size:14px;padding:4px 0}
+  .fcol a:hover{color:var(--ink)}
+  .fcol p{color:var(--ink-soft);font-size:14px;margin:0}
+  .fbot{margin-top:34px;padding-top:20px;border-top:1px solid var(--rule-soft);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-faint);font-family:"IBM Plex Mono",monospace}
+</style>
+</head>
+<body>
+
+<div class="announce">Live demo of <b>Amaze Price Builder</b> — open any product and watch the price build from your measurements.</div>
+
+<header>
+  <div class="wrap bar">
+    <a class="logo" data-go="home"><span class="mark"></span> Amaze Price Builder</a>
+    <nav class="main" id="nav"></nav>
+    <div class="spacer"></div>
+    <button class="cart-btn" data-go="cart" aria-label="Cart">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      Cart <span class="cart-count" id="cartCount">0</span>
+    </button>
+  </div>
+</header>
+
+<div id="app">
+
+  <!-- HOME -->
+  <section class="page active" id="page-home">
+    <div class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <span class="badge-pill">CUSTOM PRICING FOR SHOPIFY</span>
+          <h1>Turn any product into a <span class="accent">price builder</span>.</h1>
+          <p class="lede">A live demo of custom pricing for your Shopify store. Customers set their own options and the price is worked out on the spot — no quote forms, no waiting. The number they see is the number they pay.</p>
+          <div class="hero-cta">
+            <a class="btn btn-primary" data-go="p-blinds">Try a calculator
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></a>
+            <a class="btn btn-ghost" href="#products">Shop all</a>
+          </div>
+          <div class="chips">
+            <span class="chip"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg> No coding</span>
+            <span class="chip"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg> Live pricing</span>
+            <span class="chip"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg> Any product</span>
+            <span class="chip"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg> Adds to cart</span>
+          </div>
+        </div>
+        <div class="hero-orbit" aria-hidden="true">
+          <div class="orbit">
+            <div class="orbit-ring"></div>
+            <div class="odots tr"></div>
+            <div class="odots bl"></div>
+            <span class="spark s1">+</span>
+            <span class="spark s2">+</span>
+            <div class="orbit-node n-top"><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8V3h5"/><path d="M21 8V3h-5"/><path d="M3 16v5h5"/><path d="M21 16v5h-5"/></svg></span>Enter size</div>
+            <div class="orbit-node n-right"><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="8" x2="20" y2="8"/><circle cx="9" cy="8" r="2" fill="currentColor"/><line x1="4" y1="16" x2="20" y2="16"/><circle cx="15" cy="16" r="2" fill="currentColor"/></svg></span>Choose options</div>
+            <div class="orbit-node n-bottom"><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/><path d="M2 3h2l2.4 12.4a2 2 0 0 0 2 1.6h8.7a2 2 0 0 0 2-1.6L23 6H6"/></svg></span>Add to cart</div>
+            <div class="orbit-node n-left"><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>Price builds</div>
+            <div class="appwin">
+              <div class="aw-side">
+                <div class="aw-brand"><span class="lg">A</span> Amaze</div>
+                <div class="aw-nav">
+                  <span class="aw-item">Home</span>
+                  <span class="aw-item on">Calculators</span>
+                  <span class="aw-item">Link products</span>
+                  <span class="aw-item">Theme</span>
+                </div>
+              </div>
+              <div class="aw-main">
+                <div class="aw-top"><span>Calculators</span><span class="aw-add">+ New</span></div>
+                <div class="aw-card">
+                  <div class="awc-title">Roller blinds</div>
+                  <div class="awc-row"><span>Width</span><b>120 cm</b></div>
+                  <div class="awc-row"><span>Drop</span><b>160 cm</b></div>
+                  <div class="awc-row"><span>Motorised</span><b>Yes</b></div>
+                  <div class="awc-total"><span>Price</span><b>$324.00</b></div>
+                  <div class="awc-btn">View calculator</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="strip">
+      <div class="wrap steps3">
+        <div class="step"><div class="n">01</div><h4>Enter your size</h4><p>Type your width and height, or the area you need — every field is range-checked.</p></div>
+        <div class="step"><div class="n">02</div><h4>Choose your options</h4><p>Material, thickness, finish, add-ons — each one adjusts the price as you go.</p></div>
+        <div class="step"><div class="n">03</div><h4>Price builds live</h4><p>The total updates instantly and carries to cart with your exact spec attached.</p></div>
+      </div>
+    </div>
+
+    <div class="sec" id="products">
+      <div class="wrap">
+        <div class="sec-top"><h2>Custom pricing on every product</h2><p>Each product is priced by its own calculator. Open any one to build your price.</p></div>
+        <div class="pgrid" id="homeGrid"></div>
+      </div>
+    </div>
+
+    <div class="sec" style="padding-top:0">
+      <div class="wrap">
+        <div class="feature">
+          <div>
+            <h2>There's no fixed price, so there's no compromise.</h2>
+            <p>Behind every product is a formula, not a price tag. Enter a number, choose an option, and the total is worked out on the spot — the same way we'd quote it in the workshop.</p>
+            <a class="btn btn-primary" data-go="p-blinds">Try the calculator</a>
+          </div>
+          <div class="formula-demo">
+<span class="c">// custom pricing formula</span>
+Area  = <span class="v">W</span>/100 * <span class="v">H</span>/100
+Price = <span class="f">max</span>( Area * <span class="v">85</span> + <span class="v">motor</span> , <span class="v">60</span> )
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUCT (rendered) -->
+  <section class="page" id="page-product"></section>
+
+  <!-- CART -->
+  <section class="page" id="page-cart">
+    <div class="wrap cart-wrap">
+      <h1>Your cart</h1>
+      <div id="cartBody"></div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="fgrid">
+      <div class="fcol">
+        <a class="logo" data-go="home" style="margin-bottom:12px"><span class="mark"></span> Amaze Price Builder</a>
+        <p>A demo storefront showing what Amaze Price Builder can do on real product pages.</p>
+      </div>
+      <div class="fcol"><h5>Shop</h5><div id="footShop"></div></div>
+      <div class="fcol"><h5>Help</h5><a href="#">How pricing works</a><a href="#">Measuring guide</a><a href="#">FAQ</a></div>
+      <div class="fcol"><h5>About</h5><a href="#">About this demo</a><a href="#">Amaze Price Builder ↗</a></div>
+    </div>
+    <div class="fbot"><span>© Amaze Price Builder — demo store</span><span>powered by Amaze Price Builder</span></div>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const money = n => '$' + Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+/* ---- Product + calculator definitions (formulas match the live app build) ---- */
+const PRODUCTS = [
+  {
+    id:'p-blinds', name:'Roller Blinds — Made to Measure', type:'Blinds', hue:'--c1',
+    tint:'#eef1f7', line:'rgba(63,90,134,.10)', badge:'AREA PRICING', dim:'W × H',
+    rate:'$85 / m²', short:'Cut to your recess. Optional motorised control.',
+    logic:'Two number inputs collect the width and drop, which the calculator turns into a square-metre area and prices against a per-metre rate stored on the product itself. A checkbox handles the motorised control as an optional add-on, and a built-in minimum charge protects against undersized orders. The moment a customer changes a measurement or ticks the motor, the total recalculates and the exact spec is attached to the cart.',
+    desc:['Cut to your exact width and drop','Optional motorised control','Priced per square metre, calculated live'],
+    fields:[
+      {key:'W', label:'Width in cm', type:'number', def:120, half:true},
+      {key:'H', label:'Drop / height in cm', type:'number', def:160, half:true},
+      {key:'motor', label:'Motorised control (+$120)', type:'checkbox', def:true},
+    ],
+    calc(v){
+      const area=(v.W/100)*(v.H/100), base=area*85, motor=v.motor?120:0;
+      const total=Math.max(base+motor,60);
+      return {total, note:`${area.toFixed(2)} m² × $85${motor?' + $120 motor':''}${base+motor<60?' · min $60':''}`,
+        spec:`${v.W}×${v.H}cm${v.motor?' · motorised':''}`};
+    }
+  },
+  {
+    id:'p-glass', name:'Cut-to-Size Glass & Acrylic', type:'Glass', hue:'--c2',
+    tint:'#e9f2f1', line:'rgba(47,109,106,.10)', badge:'THICKNESS ×', dim:'mm',
+    rate:'$120 / m²', short:'Any panel, any thickness. Polished or bevelled edges.',
+    logic:'Width and height are captured in millimetres and converted to an area automatically. A dropdown lets the customer choose the glass thickness, with each option carrying its own price multiplier so thicker glass scales up proportionally. Two checkboxes cover the finishing choices, a bevelled edge and rounded corners, each adding a set amount, and a minimum charge covers the smallest cuts. The price rebuilds instantly with every change.',
+    desc:['Made to your exact dimensions (mm)','4mm, 6mm or 10mm thickness','Polished or bevelled edges, square or rounded corners','Priced per square metre, calculated live'],
+    fields:[
+      {key:'W', label:'Width in mm', type:'number', def:600, half:true},
+      {key:'H', label:'Height in mm', type:'number', def:900, half:true},
+      {key:'thickness', label:'Thickness', type:'select', def:'1.4', options:[['4 mm','1'],['6 mm','1.4'],['10 mm','1.9']]},
+      {key:'bevel', label:'Bevelled edge (+$35)', type:'checkbox', def:true},
+      {key:'rounded', label:'Rounded corners (+$18)', type:'checkbox', def:true},
+    ],
+    calc(v){
+      const area=(v.W/1000)*(v.H/1000), th=parseFloat(v.thickness);
+      const base=area*120*th, edge=v.bevel?35:0, corner=v.rounded?18:0;
+      const total=Math.max(base+edge+corner,45);
+      const tl={'1':'4mm','1.4':'6mm','1.9':'10mm'}[v.thickness]||'';
+      return {total, note:`${area.toFixed(2)} m² × $120 × ${th}${edge?' +$35 edge':''}${corner?' +$18 corner':''}${base+edge+corner<45?' · min $45':''}`,
+        spec:`${v.W}×${v.H}mm · ${tl}${v.bevel?' · bevelled':''}${v.rounded?' · rounded':''}`};
+    }
+  },
+  {
+    id:'p-banner', name:'Custom Vinyl Banner', type:'Signage', hue:'--c3',
+    tint:'#f6efdf', line:'rgba(154,107,24,.12)', badge:'CUSTOM TEXT', dim:'rush?',
+    rate:'$22 / m²', short:'Your text and size. Eyelets, material and rush options.',
+    logic:'This one shows the full range of field types working together: number inputs for the dimensions, a dropdown for the material with each grade priced differently, a number input for the eyelet count, and a checkbox for rush turnaround. The eyelets add a per-unit cost, and choosing rush applies a surcharge across the whole banner. It is a clear example of several different inputs feeding one live total.',
+    desc:['Printed to your exact size','Standard, heavy-duty or mesh material','Hemmed edges with optional eyelets','Rush 2–3 day option · priced per square metre'],
+    fields:[
+      {key:'W', label:'Width in cm', type:'number', def:200, half:true},
+      {key:'H', label:'Height in cm', type:'number', def:80, half:true},
+      {key:'material', label:'Material', type:'select', def:'1.4', options:[['Standard','1'],['Heavy-duty','1.4'],['Mesh','1.2']]},
+      {key:'eyelets', label:'Number of eyelets ($0.80 each)', type:'number', def:6},
+      {key:'rush', label:'Rush 2–3 day (+25%)', type:'checkbox', def:true},
+    ],
+    calc(v){
+      const area=(v.W/100)*(v.H/100), mat=parseFloat(v.material);
+      const base=area*22*mat + (v.eyelets||0)*0.8;
+      const total=base*(v.rush?1.25:1);
+      const ml={'1':'standard','1.4':'heavy','1.2':'mesh'}[v.material]||'';
+      return {total, note:`${area.toFixed(2)} m² × $22 × ${mat} + ${v.eyelets||0}×$0.80${v.rush?' · ×1.25 rush':''}`,
+        spec:`${v.W}×${v.H}cm · ${ml} · ${v.eyelets||0} eyelets${v.rush?' · rush':''}`};
+    }
+  },
+  {
+    id:'p-wallpaper', name:'Wallpaper & Wall Murals', type:'Wallpaper', hue:'--c4',
+    tint:'#f2ebf0', line:'rgba(122,74,107,.11)', badge:'ROUNDS TO ROLLS', dim:'m² → rolls',
+    rate:'$48 / roll', short:'Measure the wall, pick a finish — we round to full rolls.',
+    logic:'Rather than pricing by raw area, this calculator works out how many rolls the wall needs and always rounds up to a whole roll, so the customer is never left short. Wall width and height are entered as number inputs, and a checkbox switches on the satin-finish upgrade. The result is priced by the roll and recalculates the moment the measurements change.',
+    desc:['Priced by the roll from your wall measurements','Rolls calculated and rounded up for you','Matte or satin finish'],
+    fields:[
+      {key:'W', label:'Wall width in cm', type:'number', def:400, half:true},
+      {key:'H', label:'Wall height in cm', type:'number', def:260, half:true},
+      {key:'satin', label:'Satin finish (+10%)', type:'checkbox', def:true},
+    ],
+    calc(v){
+      const area=(v.W/100)*(v.H/100), rolls=Math.ceil(area/5);
+      const total=rolls*48*(v.satin?1.1:1);
+      return {total, note:`${area.toFixed(2)} m² ÷ 5 → ${rolls} roll${rolls>1?'s':''} × $48${v.satin?' · ×1.1 satin':''}`,
+        spec:`${v.W}×${v.H}cm · ${rolls} rolls${v.satin?' · satin':''}`};
+    }
+  },
+  {
+    id:'p-decking', name:'Composite Decking (per m²)', type:'Decking', hue:'--c5',
+    tint:'#eef2e9', line:'rgba(79,107,58,.11)', badge:'WASTE + MIN', dim:'m²',
+    rate:'$39 / m²', short:'Enter your area, add a cutting allowance and fixings kit.',
+    logic:'The customer enters the area directly in square metres, plus a cutting-allowance percentage that adds a little extra material for a clean fit. Two checkboxes then layer on upgrades, one for the woodgrain finish and one for a fixings kit, while a minimum order value keeps small jobs viable. Everything recalculates live as the inputs change.',
+    desc:['Priced per square metre for your project size','Built-in cutting allowance','Grooved or woodgrain finish · optional fixings kit','Minimum order applies'],
+    fields:[
+      {key:'area', label:'Area needed in m²', type:'number', def:20, half:true},
+      {key:'waste', label:'Cutting allowance %', type:'number', def:10, half:true},
+      {key:'woodgrain', label:'Woodgrain finish (+15%)', type:'checkbox', def:true},
+      {key:'fixings', label:'Add fixings kit (+$65)', type:'checkbox', def:true},
+    ],
+    calc(v){
+      const base=(v.area||0)*(1+(v.waste||0)/100)*39*(v.woodgrain?1.15:1) + (v.fixings?65:0);
+      const total=Math.max(base,250);
+      return {total, note:`${v.area||0} m² × 1.${(v.waste||0)<10?'0':''}${v.waste||0} × $39${v.woodgrain?' · ×1.15':''}${v.fixings?' +$65':''}${base<250?' · min $250':''}`,
+        spec:`${v.area||0} m² · ${v.waste||0}% waste${v.woodgrain?' · woodgrain':''}${v.fixings?' · fixings':''}`};
+    }
+  }
+];
+const byId = id => PRODUCTS.find(p=>p.id===id);
+
+/* ---- Cart (in-memory) ---- */
+let cart = [];
+function addToCart(p){
+  const inputs = readInputs(p);
+  const r = p.calc(inputs);
+  cart.push({name:p.name, spec:r.spec, price:r.total});
+  updateCartCount();
+  showToast('Added to cart — ' + money(r.total));
+}
+function updateCartCount(){ document.getElementById('cartCount').textContent = cart.length; }
+function renderCart(){
+  const b = document.getElementById('cartBody');
+  if(!cart.length){ b.innerHTML = '<div class="cart-empty">Your cart is empty. Open a product and build a price to add it here.</div>'; return; }
+  let sub = 0;
+  b.innerHTML = cart.map((it,i)=>{ sub+=it.price; return `
+    <div class="cart-item">
+      <div><div class="ci-name">${it.name}</div><div class="ci-spec">${it.spec}</div>
+        <a class="ci-remove" data-rm="${i}">Remove</a></div>
+      <div class="ci-price">${money(it.price)}</div>
+    </div>`; }).join('') +
+    `<div class="cart-total"><span>Subtotal</span><span class="amt">${money(sub)}</span></div>
+     <p style="color:var(--ink-faint);font-size:12.5px;margin-top:14px">Demo only — no checkout. Each line was priced live by Amaze Price Builder.</p>`;
+  b.querySelectorAll('[data-rm]').forEach(a=>a.addEventListener('click',()=>{ cart.splice(+a.dataset.rm,1); updateCartCount(); renderCart(); }));
+}
+
+/* ---- Calculator rendering ---- */
+function readInputs(p){
+  const v={};
+  p.fields.forEach(f=>{
+    const el=document.getElementById('f_'+p.id+'_'+f.key);
+    if(!el) { v[f.key]=f.def; return; }
+    if(f.type==='checkbox') v[f.key]=el.checked;
+    else if(f.type==='number') v[f.key]=parseFloat(el.value)||0;
+    else v[f.key]=el.value;
+  });
+  return v;
+}
+function recompute(p){
+  const r=p.calc(readInputs(p));
+  document.getElementById('total_'+p.id).textContent = money(r.total);
+  document.getElementById('note_'+p.id).textContent = r.note;
+}
+function fieldHTML(p,f){
+  const id='f_'+p.id+'_'+f.key;
+  if(f.type==='checkbox') return `<label class="chk"><input type="checkbox" id="${id}" ${f.def?'checked':''}> ${f.label}</label>`;
+  if(f.type==='select') return `<div class="field"><label for="${id}">${f.label}</label><select id="${id}">${f.options.map(o=>`<option value="${o[1]}" ${o[1]===f.def?'selected':''}>${o[0]}</option>`).join('')}</select></div>`;
+  return `<div class="field"><label for="${id}">${f.label}</label><input type="number" id="${id}" value="${f.def}" inputmode="decimal"></div>`;
+}
+function renderProduct(id){
+  const p=byId(id); if(!p) return;
+  // group consecutive half-width number fields into rows
+  let fieldsHTML='', i=0;
+  while(i<p.fields.length){
+    const f=p.fields[i];
+    if(f.half && p.fields[i+1] && p.fields[i+1].half){
+      fieldsHTML+=`<div class="frow">${fieldHTML(p,f)}${fieldHTML(p,p.fields[i+1])}</div>`; i+=2;
+    } else { fieldsHTML+=fieldHTML(p,f); i++; }
+  }
+  const el=document.getElementById('page-product');
+  el.style.setProperty('--hue','var('+p.hue+')');
+  el.style.setProperty('--line',p.line);
+  el.innerHTML=`
+    <div class="wrap crumb"><a data-go="home">Home</a> › <a href="#products" data-go="home">Shop all</a> › ${p.type}</div>
+    <div class="wrap pdp">
+      <div class="pdp-vis">
+        <div class="pdp-hero" style="background:${p.tint}"><div class="gm"></div><span class="badge">${p.badge}</span><div class="rect"></div></div>
+        <div class="pdp-desc">${p.short}<ul>${p.desc.map(d=>`<li>${d}</li>`).join('')}</ul><div class="pdp-logic"><span class="pl-h">HOW THIS CALCULATOR WORKS</span><p>${p.logic}</p></div></div>
+      </div>
+      <div>
+        <div class="pdp-type">${p.type.toUpperCase()}</div>
+        <h1>${p.name}</h1>
+        <div class="rate">Base rate ${p.rate} · final price built from your inputs</div>
+        <div class="calc-card">
+          <div class="cc-body">
+            <div class="cc-live"><span class="pulse"></span> LIVE PRICE</div>
+            ${fieldsHTML}
+            <div class="cc-total"><span class="lbl">Your price</span><span class="amt" id="total_${p.id}">$0.00</span></div>
+            <p class="cc-note" id="note_${p.id}">—</p>
+            <button class="btn btn-primary btn-block" id="add_${p.id}">Add to cart</button>
+            <a class="example-link" id="reset_${p.id}">↺ Reset to example</a>
+          </div>
+          <div class="powered">calculated by <b>Amaze Price Builder</b></div>
+        </div>
+      </div>
+    </div>`;
+  // wire
+  p.fields.forEach(f=>{
+    const inp=document.getElementById('f_'+p.id+'_'+f.key);
+    inp.addEventListener('input',()=>recompute(p));
+    inp.addEventListener('change',()=>recompute(p));
+  });
+  document.getElementById('add_'+p.id).addEventListener('click',()=>addToCart(p));
+  document.getElementById('reset_'+p.id).addEventListener('click',()=>{ renderProduct(id); });
+  recompute(p);
+}
+
+/* ---- Router ---- */
+function go(target){
+  document.querySelectorAll('.page').forEach(s=>s.classList.remove('active'));
+  if(target==='home'){ document.getElementById('page-home').classList.add('active'); }
+  else if(target==='cart'){ renderCart(); document.getElementById('page-cart').classList.add('active'); }
+  else { renderProduct(target); document.getElementById('page-product').classList.add('active'); }
+  document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on', a.dataset.go===target));
+  window.scrollTo({top:0, behavior:'auto'});
+}
+document.addEventListener('click', e=>{
+  const t=e.target.closest('[data-go]');
+  if(t){ e.preventDefault(); go(t.dataset.go); }
+});
+
+/* ---- Build nav, home grid, footer shop ---- */
+function build(){
+  const nav=document.getElementById('nav');
+  nav.innerHTML=`<a data-go="home">Home</a>` + PRODUCTS.map(p=>`<a data-go="${p.id}">${p.type}</a>`).join('');
+  const grid=document.getElementById('homeGrid');
+  grid.innerHTML=PRODUCTS.map(p=>`
+    <a class="pcard" data-go="${p.id}" style="--hue:var(${p.hue});--line:${p.line}">
+      <div class="thumb" style="background:${p.tint}"><div class="gm"></div><span class="badge">${p.badge}</span><span class="dim">${p.dim}</span></div>
+      <div class="pbody"><h3>${p.name.replace(' — Made to Measure','').replace(' (per m²)','')}</h3>
+        <p class="desc">${p.short}</p>
+        <div class="prow"><span class="from">from <b>${p.rate.split(' / ')[0]}</b> / ${p.rate.split(' / ')[1]}</span><span class="go">Build price →</span></div>
+      </div>
+    </a>`).join('');
+  document.getElementById('footShop').innerHTML=PRODUCTS.map(p=>`<a data-go="${p.id}">${p.type}</a>`).join('');
+}
+
+/* ---- Toast ---- */
+let toastT;
+function showToast(msg){
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+build();
+updateCartCount();
+</script>
+</body>
+</html>
