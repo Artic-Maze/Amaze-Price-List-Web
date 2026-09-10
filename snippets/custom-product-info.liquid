@@ -1,0 +1,147 @@
+{% comment %}
+  Prints the product-page content that sits around the Amaze Price Builder
+  calculator: the type eyebrow with its badge and dimension chip, the base
+  rate line, the short description and spec list, and the "how this calculator
+  works" panel from made-and-measured-demo-store.html.
+
+  Rendered from a custom_liquid block in templates/product.json:
+
+      {% render 'custom-product-info', product: product, part: 'head' %}
+
+  Keeping the logic in a versioned snippet rather than typing Liquid into the
+  block setting means it stays reviewable and every product page gets fixes at
+  once. The block itself is one line.
+
+  Nothing here touches the app's calculator form — the app owns that markup.
+
+  Every field is optional. A product with no metafields set renders only what
+  it can derive from product data, so this is safe to enable catalogue-wide
+  before the metafields are filled in.
+
+  Metafields read (namespace defaults to "custom"):
+    calc_badge   single_line_text_field        "Area pricing"
+    calc_dim     single_line_text_field        "W x H"
+    calc_unit    single_line_text_field        "m2"
+    calc_rate    single_line_text_field        "$85 / m2"  (overrides price)
+    calc_short   single_line_text_field        one-line summary
+    calc_specs   list.single_line_text_field   bullet list
+    calc_logic   multi_line_text_field         the panel's paragraph(s)
+    calc_accent  color                         per-product accent
+
+  Accepts:
+  - product:     {Object} the product (required). {% render %} isolates its
+                 scope, so this must be passed explicitly rather than relied
+                 on from the template.
+  - namespace:   {String} metafield namespace. Default: 'custom'
+  - rate_prefix: {String} label before the rate. Default: 'Base rate'
+  - rate_suffix: {String} note after the rate. Default: 'final price built
+                 from your inputs'. Pass '' to drop it.
+  - part:        {String} 'head' (eyebrow + rate), 'body' (short, specs,
+                 logic) or 'all'. The demo splits these around the form, so
+                 use two blocks with 'head' above it and 'body' below.
+
+  Usage:
+  {% render 'custom-product-info', product: product, part: 'head' %}
+  {% render 'custom-product-info', product: product, part: 'body' %}
+{% endcomment %}
+
+{%- liquid
+  assign ns = namespace | default: 'custom'
+  assign which = part | default: 'all'
+  assign prefix = rate_prefix | default: 'Base rate'
+  assign suffix = rate_suffix | default: 'final price built from your inputs'
+  assign mf = product.metafields[ns]
+
+  assign badge = mf.calc_badge.value
+  assign dim = mf.calc_dim.value
+  assign unit = mf.calc_unit.value
+  assign rate = mf.calc_rate.value
+  assign short = mf.calc_short.value
+  assign specs = mf.calc_specs.value
+  assign logic = mf.calc_logic.value
+  assign accent = mf.calc_accent.value
+
+  if accent == blank
+    assign accent = '#004EBA'
+  endif
+  assign line = accent | color_modify: 'alpha', 0.1
+  assign tint = accent | color_mix: '#FFFFFF', 8
+
+  comment
+    The rate line prefers an explicit metafield, then falls back to the
+    product's own price so something sensible shows before anyone fills the
+    field in.
+  endcomment
+  assign rate_value = rate
+  if rate_value == blank and product.price > 0
+    assign rate_value = product.price | money_without_trailing_zeros
+  endif
+-%}
+
+{%- comment -%}
+  Per-product accent handed to assets/custom-main-product.css, which uses it
+  for the media crosshatch, the badge and the logic panel. Emitted only by the
+  head part so two blocks on one page do not duplicate it. section.id is not
+  reachable from inside a snippet, and a product page has exactly one product
+  section, so .product is scope enough.
+{%- endcomment -%}
+{%- if which != 'body' -%}
+  <style>
+    .product {
+      --pdp-hue: {{ accent }};
+      --pdp-tint: {{ tint }};
+      --pdp-line: {{ line }};
+    }
+  </style>
+{%- endif -%}
+
+<div class="--pdp-info">
+  {%- if which != 'body' -%}
+  {%- if product.type != blank or badge != blank or dim != blank -%}
+    <div class="--pdp-eyebrow">
+      {%- if product.type != blank -%}
+        <span>{{ product.type }}</span>
+      {%- endif -%}
+      {%- if badge != blank -%}
+        <span class="--pdp-badge">{{ badge }}</span>
+      {%- endif -%}
+      {%- if dim != blank -%}
+        <span class="--pdp-dim">{{ dim }}</span>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  {%- if rate_value != blank -%}
+    <p class="--pdp-rate">
+      {{ prefix }}
+      <b>{{ rate_value }}</b>
+      {%- if unit != blank %} / {{ unit }}{% endif -%}
+      {%- if suffix != blank %} &middot; {{ suffix }}{% endif -%}
+    </p>
+  {%- endif -%}
+  {%- endif -%}
+
+  {%- if which != 'head' -%}
+  {%- if short != blank -%}
+    <p class="--pdp-short">{{ short }}</p>
+  {%- endif -%}
+
+  {%- if specs != blank and specs.size > 0 -%}
+    <ul class="--pdp-specs" role="list">
+      {%- for spec in specs -%}
+        <li>
+          {%- render 'custom-icons', name: 'check', size: 14, stroke: 2.4 -%}
+          <span>{{ spec }}</span>
+        </li>
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
+
+  {%- if logic != blank -%}
+    <div class="--pdp-logic">
+      <span class="--pdp-logic-kicker">How this calculator works</span>
+      <div class="--pdp-logic-body">{{ logic | escape | newline_to_br }}</div>
+    </div>
+  {%- endif -%}
+  {%- endif -%}
+</div>

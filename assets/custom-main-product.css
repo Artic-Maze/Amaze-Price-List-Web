@@ -1,0 +1,366 @@
+/* ===========================================================================
+   CUSTOM MAIN PRODUCT — branding layer
+   ---------------------------------------------------------------------------
+   Retargets Dawn's product-page classes onto the Gymshark token layer without
+   forking sections/main-product.liquid. The section file stays stock, so the
+   Amaze Price Builder app block keeps its binding in templates/product.json
+   and future Dawn updates stay mergeable.
+
+   Loaded by the custom_liquid block that renders snippets/custom-product-info,
+   so it only downloads on product pages.
+
+   Deliberately does NOT style the app's calculator form. The app owns that
+   markup; this file gives it breathing room and leaves its internals alone.
+   =========================================================================== */
+
+/* ---------------------------------------------------------------------------
+   1. Info column
+   --------------------------------------------------------------------------- */
+.product__info-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--global-spacing-16, 1.6rem);
+}
+
+.product__info-container > * {
+  margin: 0;
+}
+
+.product__title,
+.product__title > * {
+  font-family: var(--fds-type-title-family, inherit);
+  font-weight: var(--fds-type-title-weight, 800);
+  font-size: clamp(2.4rem, 4vw, 3.2rem);
+  line-height: var(--fds-type-title-leading, 0.9);
+  letter-spacing: var(--global-type-letterspacing-0pc, 0);
+  word-break: normal;
+}
+
+/* Vendor / eyebrow text block */
+.product__text.caption-with-letter-spacing,
+.product__text.subtitle {
+  font-family: var(--fds-type-meta-family, inherit);
+  font-size: var(--fds-type-meta-size, 1.2rem);
+  font-weight: var(--global-type-weight-skandia-bold, 700);
+  line-height: var(--fds-type-meta-leading, 1.3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fds-color-text-muted, #767a7f);
+}
+
+.product .price,
+.product .price__container {
+  font-family: var(--fds-type-title-family, inherit);
+  font-weight: var(--fds-type-title-weight, 800);
+  letter-spacing: var(--global-type-letterspacing-0pc, 0);
+}
+
+.product .price--large {
+  font-size: var(--global-type-size-24, 2.4rem);
+  line-height: 1;
+}
+
+.product .price--on-sale .price-item--regular {
+  color: var(--fds-color-text-muted, #767a7f);
+  font-weight: var(--global-type-weight-skandia-book, 400);
+}
+
+.product .price__sale .price-item--sale,
+.product .price--on-sale .price-item--sale {
+  color: var(--fds-color-text-sale, #dc0428);
+}
+
+.product .product__tax,
+.product .product__sku,
+.product .product__inventory {
+  font-family: var(--fds-type-body-family, inherit);
+  font-size: var(--global-type-size-12, 1.2rem);
+  color: var(--fds-color-text-muted, #767a7f);
+}
+
+.product__description,
+.product .rte {
+  font-family: var(--fds-type-body-family, inherit);
+  font-size: var(--global-type-size-14, 1.4rem);
+  line-height: var(--global-type-line-height-140pc, 1.4);
+  color: var(--fds-color-text-muted, #767a7f);
+}
+
+.product__description strong,
+.product .rte strong {
+  color: rgb(var(--color-foreground, 13, 16, 18));
+  font-weight: var(--global-type-weight-skandia-bold, 700);
+}
+
+/* ---------------------------------------------------------------------------
+   2. Form controls — square, hairline, Gymshark
+   --------------------------------------------------------------------------- */
+.product-form__input .form__label,
+.product-form__input legend.form__label {
+  font-family: var(--fds-type-meta-family, inherit);
+  font-size: var(--fds-type-meta-size, 1.2rem);
+  font-weight: var(--global-type-weight-skandia-bold, 700);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fds-color-text-muted, #767a7f);
+}
+
+.product-form__input .select__select,
+.product-form__input input[type='text'],
+.product-form__input input[type='number'],
+.product-form__input textarea,
+.product .quantity__input {
+  font-family: var(--fds-type-body-family, inherit);
+  font-size: var(--global-type-size-14, 1.4rem);
+  border-radius: var(--fds-radii-angled, 0);
+}
+
+/* Variant pills: square, hairline, filled when selected. */
+.product-form__input .product-form__label,
+.product-form__input label[for^='template--'] {
+  border-radius: var(--fds-radii-angled, 0);
+}
+
+.product-form__input input[type='radio'] + label {
+  border-radius: var(--fds-radii-angled, 0);
+  font-family: var(--fds-type-body-family, inherit);
+  font-size: var(--global-type-size-12, 1.2rem);
+  font-weight: var(--global-type-weight-skandia-bold, 700);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.product-form__input input[type='radio']:checked + label {
+  background: var(--fds-color-surface-inverse, #0d1012);
+  color: var(--fds-color-text-inverse, #fff);
+  border-color: var(--fds-color-border-strong, #0d1012);
+}
+
+.product .quantity {
+  border-radius: var(--fds-radii-angled, 0);
+}
+
+/* ---------------------------------------------------------------------------
+   3. Buttons
+   --------------------------------------------------------------------------- */
+.product .product-form__submit,
+.product .shopify-payment-button__button--unbranded {
+  border-radius: var(--fds-radii-angled, 0);
+  font-family: var(--fds-type-body-family, inherit);
+  font-size: var(--global-type-size-14, 1.4rem);
+  font-weight: var(--global-type-weight-skandia-bold, 700);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  min-height: 5.2rem;
+}
+
+.product .product-form__submit {
+  background: var(--fds-color-surface-inverse, #0d1012);
+  color: var(--fds-color-text-inverse, #fff);
+  border-color: transparent;
+}
+
+.product .product-form__submit:hover:not([disabled]) {
+  background: var(--global-color-neutral-800, #1b1d22);
+}
+
+.product .product-form__submit[disabled],
+.product .product-form__submit[aria-disabled='true'] {
+  background: var(--fds-color-surface-subdued, #dee0e3);
+  color: var(--fds-color-text-disabled, #bec2c6);
+}
+
+/* ---------------------------------------------------------------------------
+   4. Media — blueprint treatment
+   Colours come from --pdp-* custom properties that
+   snippets/custom-product-info.liquid sets per product from its metafields.
+   --------------------------------------------------------------------------- */
+.product {
+  --pdp-hue: var(--fds-color-text-accent, #004eba);
+  --pdp-tint: var(--global-color-neutral-100, #f4f5f6);
+  --pdp-line: rgba(0, 78, 186, 0.1);
+}
+
+.product .product-media-container {
+  position: relative;
+  background: var(--pdp-tint);
+  border-radius: var(--fds-radii-angled, 0);
+  border-color: var(--fds-color-border-default, #dee0e3);
+}
+
+/* Crosshatch sits behind the image, so a product with no photo still reads as
+   a measured product rather than an empty box. */
+.product .product-media-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--pdp-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--pdp-line) 1px, transparent 1px);
+  background-size: 2.2rem 2.2rem;
+}
+
+.product .product-media-container > * {
+  position: relative;
+  z-index: 1;
+}
+
+.product .product__media-item img,
+.product .product__media-item video {
+  border-radius: var(--fds-radii-angled, 0);
+}
+
+/* ---------------------------------------------------------------------------
+   5. Accordions and popups
+   --------------------------------------------------------------------------- */
+.product .product__accordion .summary__title,
+.product .product__accordion h2 {
+  font-family: var(--fds-type-heading-family, inherit);
+  font-weight: var(--fds-type-title-weight, 800);
+  font-size: var(--global-type-size-14, 1.4rem);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.product .product__accordion {
+  border-top: var(--fds-border-width-fine, 0.1rem) solid var(--fds-color-border-default, #dee0e3);
+}
+
+.product .product-popup-modal__opener .product-popup-modal__button,
+.product .product__view-details {
+  font-family: var(--fds-type-body-family, inherit);
+  font-size: var(--global-type-size-12, 1.2rem);
+  font-weight: var(--global-type-weight-skandia-bold, 700);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--fds-color-text-accent, #004eba);
+  text-underline-offset: 0.3em;
+}
+
+/* ---------------------------------------------------------------------------
+   6. Printed content block — snippets/custom-product-info.liquid
+   --------------------------------------------------------------------------- */
+.--pdp-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--global-spacing-16, 1.6rem);
+}
+
+.--pdp-eyebrow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  font-family: var(--fds-type-meta-family, inherit);
+  font-size: var(--fds-type-meta-size, 1.2rem);
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--pdp-hue);
+}
+
+.--pdp-badge {
+  display: inline-block;
+  padding: 0.4rem 0.9rem;
+  background: var(--pdp-hue);
+  color: var(--fds-color-text-inverse, #fff);
+  border-radius: var(--fds-radii-angled, 0);
+  font-weight: var(--global-type-weight-skandia-bold, 700);
+}
+
+.--pdp-dim {
+  display: inline-block;
+  padding: 0.4rem 0.9rem;
+  background: var(--fds-color-surface-default, #fff);
+  color: var(--pdp-hue);
+  border: var(--fds-border-width-fine, 0.1rem) solid var(--fds-color-border-default, #dee0e3);
+  border-radius: var(--fds-radii-angled, 0);
+}
+
+.--pdp-rate {
+  font-family: var(--fds-type-body-family, inherit);
+  font-size: var(--global-type-size-14, 1.4rem);
+  line-height: var(--global-type-line-height-140pc, 1.4);
+  color: var(--fds-color-text-muted, #767a7f);
+}
+
+.--pdp-rate b {
+  color: rgb(var(--color-foreground, 13, 16, 18));
+  font-family: var(--fds-type-title-family, inherit);
+  font-weight: var(--fds-type-title-weight, 800);
+  font-size: var(--global-type-size-16, 1.6rem);
+}
+
+.--pdp-short {
+  font-family: var(--fds-type-body-family, inherit);
+  font-size: var(--global-type-size-14, 1.4rem);
+  line-height: var(--global-type-line-height-140pc, 1.4);
+  color: var(--fds-color-text-muted, #767a7f);
+}
+
+.--pdp-specs {
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.--pdp-specs li {
+  list-style: none;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.9rem;
+  align-items: start;
+  font-family: var(--fds-type-body-family, inherit);
+  font-size: var(--global-type-size-14, 1.4rem);
+  line-height: var(--global-type-line-height-140pc, 1.4);
+  color: var(--fds-color-text-muted, #767a7f);
+}
+
+.--pdp-specs svg {
+  margin-top: 0.2rem;
+  color: var(--fds-color-feedback-positive, #009966);
+}
+
+/* The demo's "how this calculator works" panel: a tinted note with a mono
+   kicker, set apart from the description. */
+.--pdp-logic {
+  padding: 1.4rem 1.6rem;
+  background: var(--pdp-tint);
+  border: var(--fds-border-width-fine, 0.1rem) solid var(--fds-color-border-default, #dee0e3);
+  border-radius: var(--fds-radii-angled, 0);
+}
+
+.--pdp-logic-kicker {
+  display: block;
+  margin-bottom: 0.6rem;
+  font-family: var(--fds-type-meta-family, inherit);
+  font-size: 1.05rem;
+  font-weight: var(--global-type-weight-skandia-bold, 700);
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--pdp-hue);
+}
+
+.--pdp-logic-body {
+  font-family: var(--fds-type-body-family, inherit);
+  font-size: var(--global-type-size-14, 1.4rem);
+  line-height: var(--global-type-line-height-140pc, 1.4);
+  color: var(--fds-color-text-muted, #767a7f);
+}
+
+.--pdp-logic-body p {
+  margin: 0 0 0.8rem;
+}
+
+.--pdp-logic-body p:last-child {
+  margin-bottom: 0;
+}
+
+/* Gives the app's calculator block room without touching its internals. */
+.product__info-container .shopify-app-block {
+  margin-block: var(--global-spacing-8, 0.8rem);
+}
