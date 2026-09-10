@@ -1,0 +1,45 @@
+{% comment %}
+  Renders the brand lockup — the logo image, or the square mark beside the
+  wordmark. Shared by the header and the footer so the two cannot drift.
+
+  Emits the inner content only; the caller supplies the wrapping <a> (or
+  heading) and owns the presentation. Each section styles .--logo-mark and
+  .--header-logo-text in its own scoped block, the same way every section here
+  restyles the shared element classes it uses.
+
+  The mark is the demo store's measurement motif: a bordered square with a
+  small accent square notched into its top-right corner. Its colour comes from
+  --mark-accent on the section container.
+
+  Accepts:
+  - logo:      {Object} image; used alone when set
+  - text:      {String} wordmark; defaults to the shop name
+  - show_mark: {Boolean} draw the square mark beside the wordmark
+  - width:     {Number} rendered logo width in px, for the sizes attribute
+
+  Usage:
+  {% render 'custom-brand-lockup', logo: section.settings.logo, text: 'Amaze' %}
+{% endcomment %}
+
+{%- liquid
+  assign wordmark = text | default: shop.name
+  assign logo_w = width | default: 130
+-%}
+
+{%- if logo != blank -%}
+  {{
+    logo
+    | image_url: width: 600
+    | image_tag:
+      class: '--header-logo-image',
+      widths: '120, 180, 240, 360, 480, 600',
+      sizes: logo_w | append: 'px',
+      loading: 'eager',
+      alt: shop.name
+  }}
+{%- else -%}
+  {%- if show_mark -%}
+    <span class="--logo-mark" aria-hidden="true"></span>
+  {%- endif -%}
+  <span class="--header-logo-text">{{ wordmark }}</span>
+{%- endif -%}

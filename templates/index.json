@@ -334,11 +334,77 @@
         "padding_top_mobile": 40,
         "padding_bottom_mobile": 40
       }
+    },
+    "formula": {
+      "type": "custom-formula-panel",
+      "blocks": {
+        "line-0": {
+          "type": "line",
+          "settings": {
+            "text": "// custom pricing formula",
+            "style": "comment"
+          }
+        },
+        "line-1": {
+          "type": "line",
+          "settings": {
+            "text": "Area  = `W`/100 * `H`/100",
+            "style": "code"
+          }
+        },
+        "line-2": {
+          "type": "line",
+          "settings": {
+            "text": "Price = ~max~( Area * `85` + `motor` , `60` )",
+            "style": "code"
+          }
+        }
+      },
+      "block_order": [
+        "line-0",
+        "line-1",
+        "line-2"
+      ],
+      "settings": {
+        "full_width": false,
+        "navid": "formula",
+        "color_scheme": "scheme-1",
+        "panel_color_scheme": "scheme-3",
+        "heading": "There's no fixed price, so there's no compromise.",
+        "heading_size": 30,
+        "uppercase_heading": false,
+        "body": "<p>Behind every product is a formula, not a price tag. Enter a number, choose an option, and the total is worked out on the spot — the same way we'd quote it in the workshop.</p>",
+        "cta_label": "Try the calculator",
+        "cta_link": "",
+        "column_ratio": "1.2fr 1fr",
+        "reverse": false,
+        "vertical_align": "center",
+        "panel_padding": 44,
+        "panel_padding_mobile": 28,
+        "panel_gap": 40,
+        "panel_gap_mobile": 28,
+        "code_size": 13,
+        "code_leading": 1.9,
+        "code_padding": 18,
+        "value_color": "#85B3F4",
+        "function_color": "#FFD685",
+        "comment_color": "#9AA8AD",
+        "bg_color": "",
+        "margin_top": 0,
+        "margin_bottom": 0,
+        "padding_top": 0,
+        "padding_bottom": 64,
+        "margin_top_mobile": 0,
+        "margin_bottom_mobile": 0,
+        "padding_top_mobile": 0,
+        "padding_bottom_mobile": 40
+      }
     }
   },
   "order": [
     "hero",
     "steps",
-    "products"
+    "products",
+    "formula"
   ]
 }

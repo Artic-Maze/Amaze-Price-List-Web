@@ -1,0 +1,561 @@
+{% comment %}
+  Custom formula panel.
+
+  Structure follows sections/base.liquid: a scoped style block keyed on
+  section.id, a .section-container--{{ section.id }} wrapper carrying the
+  spacing settings, a .section-wrapper--{{ section.id }} inner, then the schema.
+
+  Layout and content follow the dark feature panel in
+  made-and-measured-demo-store.html: an inverse card sitting inside a normal
+  section, pitch on the left, a syntax-coloured formula block on the right.
+
+  The panel takes its own colour scheme rather than a hardcoded dark fill, so
+  it is a card inside the page rather than a full-bleed band — which is what
+  the demo does, and it means light-on-dark and dark-on-light are one setting
+  apart.
+
+  No JavaScript.
+{% endcomment %}
+
+{%- liquid
+  assign lines = section.blocks | where: 'type', 'line'
+  assign ratio = section.settings.column_ratio | default: '1.2fr 1fr'
+-%}
+
+<style>
+  .section-container--{{ section.id }} {
+    margin-top: {{ section.settings.margin_top | append: 'px' }};
+    margin-bottom: {{ section.settings.margin_bottom | append: 'px' }};
+    padding-top: {{ section.settings.padding_top | append: 'px' }};
+    padding-bottom: {{ section.settings.padding_bottom | append: 'px' }};
+    {% if section.settings.bg_color != blank %}background: {{ section.settings.bg_color }};{% endif %}
+  }
+
+  .section-container--{{ section.id }} {
+    .--feature {
+      display: grid;
+      grid-template-columns: {{ ratio }};
+      gap: {{ section.settings.panel_gap | append: 'px' }};
+      align-items: {{ section.settings.vertical_align | default: 'center' }};
+      padding: {{ section.settings.panel_padding | append: 'px' }};
+      border-radius: var(--fds-radii-angled, 0);
+      background: rgb(var(--color-background, 13, 16, 18));
+      color: rgb(var(--color-foreground, 255, 255, 255));
+    }
+
+    .--feature-copy {
+      min-width: 0;
+      {% if section.settings.reverse %}order: 2;{% endif %}
+    }
+
+    .--feature-heading {
+      margin: 0 0 1.2rem;
+      color: rgb(var(--color-foreground, 255, 255, 255));
+      font-family: var(--fds-type-title-family, inherit);
+      font-weight: var(--fds-type-title-weight, 800);
+      font-size: clamp(2.2rem, 3.5vw, {{ section.settings.heading_size | append: 'px' }});
+      line-height: var(--fds-type-title-leading, 0.9);
+      letter-spacing: var(--global-type-letterspacing-0pc, 0);
+      {% if section.settings.uppercase_heading %}text-transform: var(--global-type-case-upper, uppercase);{% endif %}
+    }
+
+    .--feature-body {
+      margin: 0 0 2rem;
+      max-width: 46ch;
+      /* The scheme's own foreground, stepped back rather than a second colour. */
+      opacity: 0.75;
+      font-family: var(--fds-type-body-family, inherit);
+      font-size: var(--global-type-size-16, 1.6rem);
+      line-height: var(--global-type-line-height-140pc, 1.4);
+    }
+
+    .--feature-body p {
+      margin: 0 0 1rem;
+    }
+
+    .--feature-body p:last-child {
+      margin-bottom: 0;
+    }
+
+    .--feature-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.9rem;
+      padding: 1.3rem 2.2rem;
+      border: var(--fds-border-width-regular, 0.2rem) solid transparent;
+      border-radius: var(--fds-radii-angled, 0);
+      /* Inverted against the panel: the scheme's foreground becomes the fill. */
+      background: rgb(var(--color-foreground, 255, 255, 255));
+      color: rgb(var(--color-background, 13, 16, 18));
+      text-decoration: none;
+      white-space: nowrap;
+      font-family: var(--fds-type-body-family, inherit);
+      font-size: var(--global-type-size-14, 1.4rem);
+      font-weight: var(--global-type-weight-skandia-bold, 700);
+      line-height: 1;
+      text-transform: var(--global-type-case-upper, uppercase);
+      letter-spacing: 0.08em;
+      transition: opacity var(--duration-default, 200ms) var(--ease-out, ease-out);
+    }
+
+    .--feature-cta:hover {
+      opacity: 0.85;
+    }
+
+    .--feature-cta svg {
+      flex: none;
+      transition: transform var(--duration-default, 200ms) var(--ease-out, ease-out);
+    }
+
+    .--feature-cta:hover svg {
+      transform: translateX(0.3rem);
+    }
+
+    /* ---- formula block ---- */
+    .--formula {
+      min-width: 0;
+      padding: {{ section.settings.code_padding | append: 'px' }};
+      border-radius: var(--fds-radii-angled, 0);
+      /* Two overlay steps on the panel fill. The token set carries a single
+         on-dark overlay at .15, so the fainter fill is set explicitly. */
+      background: rgba(255, 255, 255, 0.05);
+      border: var(--fds-border-width-fine, 0.1rem) solid var(--fds-color-overlay-on-dark, rgba(255, 255, 255, 0.15));
+      overflow-x: auto;
+      {% if section.settings.reverse %}order: 1;{% endif %}
+    }
+
+    .--fm-line {
+      display: block;
+      /* Preserves the alignment a merchant types into the setting. */
+      white-space: pre;
+      font-family: var(--fds-type-meta-family, ui-monospace, monospace);
+      font-size: {{ section.settings.code_size | append: 'px' }};
+      line-height: {{ section.settings.code_leading }};
+      color: rgb(var(--color-foreground, 255, 255, 255));
+    }
+
+    .--fm-line.--is-blank {
+      white-space: pre;
+    }
+
+    .--fm-line.--is-comment {
+      color: {{ section.settings.comment_color }};
+    }
+
+    .--fm-value {
+      color: {{ section.settings.value_color }};
+    }
+
+    .--fm-fn {
+      color: {{ section.settings.function_color }};
+    }
+  }
+
+  @media screen and (max-width: 760px) {
+    .section-container--{{ section.id }} .--feature {
+      grid-template-columns: 1fr;
+      gap: {{ section.settings.panel_gap_mobile | append: 'px' }};
+      padding: {{ section.settings.panel_padding_mobile | append: 'px' }};
+    }
+
+    .section-container--{{ section.id }} .--feature-copy,
+    .section-container--{{ section.id }} .--formula {
+      order: 0;
+    }
+
+    .section-container--{{ section.id }} .--feature-body {
+      max-width: none;
+    }
+
+    .section-container--{{ section.id }} {
+      margin-top: {{ section.settings.margin_top_mobile | append: 'px' }};
+      margin-bottom: {{ section.settings.margin_bottom_mobile | append: 'px' }};
+      padding-top: {{ section.settings.padding_top_mobile | append: 'px' }};
+      padding-bottom: {{ section.settings.padding_bottom_mobile | append: 'px' }};
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .section-container--{{ section.id }} * {
+      transition-duration: 1ms !important;
+    }
+  }
+</style>
+
+<section
+  class="section-container--{{ section.id }} color-{{ section.settings.color_scheme }}"
+  id="{{ section.settings.navid | default: 'formula' }}"
+>
+  <div class="section-wrapper--{{ section.id }}{% if section.settings.full_width != true %} page-width{% endif %}">
+    <div class="--feature color-{{ section.settings.panel_color_scheme }}">
+      <div class="--feature-copy">
+        {%- if section.settings.heading != blank -%}
+          <h2 class="--feature-heading">{{ section.settings.heading }}</h2>
+        {%- endif -%}
+
+        {%- if section.settings.body != blank -%}
+          <div class="--feature-body">{{ section.settings.body }}</div>
+        {%- endif -%}
+
+        {%- if section.settings.cta_label != blank -%}
+          {%- assign cta_url = section.settings.cta_link | default: routes.all_products_collection_url -%}
+          <a class="--feature-cta" href="{{ cta_url }}">
+            <span>{{ section.settings.cta_label | escape }}</span>
+            {%- render 'custom-icons', name: 'arrow-right', size: 15 -%}
+          </a>
+        {%- endif -%}
+      </div>
+
+      {%- if lines.size > 0 -%}
+        <div class="--formula">
+          {%- for block in lines -%}
+            {%- render 'custom-formula-line',
+              text: block.settings.text,
+              style: block.settings.style,
+              attrs: block.shopify_attributes
+            -%}
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Custom Formula Panel",
+  "tag": "div",
+  "class": "custom-formula-panel-section",
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full Width Section",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "navid",
+      "label": "Id(for navigation)",
+      "default": "formula"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Section color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "color_scheme",
+      "id": "panel_color_scheme",
+      "label": "Panel color scheme",
+      "default": "scheme-3",
+      "info": "The card itself. Scheme-3 is the inverse panel from the demo store."
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "There's no fixed price, so there's no compromise."
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "min": 18,
+      "max": 56,
+      "step": 1,
+      "unit": "px",
+      "label": "Heading max size",
+      "default": 30
+    },
+    {
+      "type": "checkbox",
+      "id": "uppercase_heading",
+      "label": "Uppercase heading",
+      "default": false
+    },
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "Body",
+      "default": "<p>Behind every product is a formula, not a price tag. Enter a number, choose an option, and the total is worked out on the spot — the same way we'd quote it in the workshop.</p>"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button label",
+      "default": "Try the calculator"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "column_ratio",
+      "label": "Column ratio",
+      "options": [
+        { "value": "1.2fr 1fr", "label": "Copy-heavy (demo store)" },
+        { "value": "1fr 1fr", "label": "Equal halves" },
+        { "value": "1fr 1.2fr", "label": "Formula-heavy" }
+      ],
+      "default": "1.2fr 1fr"
+    },
+    {
+      "type": "checkbox",
+      "id": "reverse",
+      "label": "Formula on the left",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "vertical_align",
+      "label": "Vertical alignment",
+      "options": [
+        { "value": "center", "label": "Center" },
+        { "value": "start", "label": "Top" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "panel_padding",
+      "min": 16,
+      "max": 96,
+      "step": 2,
+      "unit": "px",
+      "label": "Panel padding",
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "panel_padding_mobile",
+      "min": 12,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "label": "Panel padding (Mobile)",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "panel_gap",
+      "min": 0,
+      "max": 96,
+      "step": 2,
+      "unit": "px",
+      "label": "Column gap",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "panel_gap_mobile",
+      "min": 0,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "label": "Column gap (Mobile)",
+      "default": 28
+    },
+    {
+      "type": "header",
+      "content": "Formula block"
+    },
+    {
+      "type": "paragraph",
+      "content": "Add a Line block per row. In a line, wrap a value in `backticks` to colour it, and a function in ~tildes~. Leading spaces are preserved, so you can align the = signs."
+    },
+    {
+      "type": "range",
+      "id": "code_size",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Code size",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "code_leading",
+      "min": 1.2,
+      "max": 2.4,
+      "step": 0.1,
+      "label": "Code line height",
+      "default": 1.9
+    },
+    {
+      "type": "range",
+      "id": "code_padding",
+      "min": 8,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Code block padding",
+      "default": 18
+    },
+    {
+      "type": "color",
+      "id": "value_color",
+      "label": "Value color",
+      "default": "#85B3F4"
+    },
+    {
+      "type": "color",
+      "id": "function_color",
+      "label": "Function color",
+      "default": "#FFD685"
+    },
+    {
+      "type": "color",
+      "id": "comment_color",
+      "label": "Comment color",
+      "default": "#9AA8AD"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background Color",
+      "info": "Overrides the section color scheme when set."
+    },
+    {
+      "type": "header",
+      "content": "Desktop Spacing"
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Bottom",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 64
+    },
+    {
+      "type": "header",
+      "content": "Mobile Spacing"
+    },
+    {
+      "type": "range",
+      "id": "margin_top_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Top (Mobile)",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Bottom (Mobile)",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Top (Mobile)",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Bottom (Mobile)",
+      "default": 40
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Line",
+      "type": "line",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "info": "`value` colours a value, ~name~ colours a function."
+        },
+        {
+          "type": "select",
+          "id": "style",
+          "label": "Style",
+          "options": [
+            { "value": "code", "label": "Code" },
+            { "value": "comment", "label": "Comment" },
+            { "value": "blank", "label": "Blank line" }
+          ],
+          "default": "code"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Formula Panel",
+      "category": "Custom Sections",
+      "blocks": [
+        { "type": "line", "settings": { "text": "// custom pricing formula", "style": "comment" } },
+        { "type": "line", "settings": { "text": "Area  = `W`/100 * `H`/100", "style": "code" } },
+        { "type": "line", "settings": { "text": "Price = ~max~( Area * `85` + `motor` , `60` )", "style": "code" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

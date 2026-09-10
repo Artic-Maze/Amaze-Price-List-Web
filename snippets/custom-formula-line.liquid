@@ -1,0 +1,55 @@
+{% comment %}
+  Renders one line of the formula panel's code block.
+
+  Merchants write plain text; two markdown-style markers add the syntax
+  colour, so nobody has to type HTML into a theme setting:
+
+    `backticks`  -> value / variable colour
+    ~tildes~     -> function colour
+
+  Both are parsed by splitting on the marker and colouring the odd-indexed
+  parts, the same trick markdown uses for inline code. A line whose style is
+  "comment" is coloured whole and the markers are left alone.
+
+  Text is escaped after splitting, so a formula can safely contain < and >.
+
+  Whitespace control is deliberate and tight throughout: the container sets
+  white-space: pre to keep the demo's column alignment, so any stray newline
+  from Liquid would show up on the page.
+
+  Markup only; styling lives in sections/custom-formula-panel.liquid.
+
+  Accepts:
+  - text:  {String} the line
+  - style: {String} 'code' | 'comment' | 'blank'
+  - attrs: {String} block.shopify_attributes
+
+  Usage:
+  {% render 'custom-formula-line', text: block.settings.text, style: block.settings.style %}
+{% endcomment %}
+
+{%- if style == 'blank' -%}
+  <code class="--fm-line --is-blank" aria-hidden="true" {{ attrs }}>&nbsp;</code>
+{%- elsif style == 'comment' -%}
+  <code class="--fm-line --is-comment" {{ attrs }}>{{ text | escape }}</code>
+{%- else -%}
+  <code class="--fm-line" {{ attrs }}>
+    {%- assign value_parts = text | split: '`' -%}
+    {%- for value_part in value_parts -%}
+      {%- assign is_value = forloop.index0 | modulo: 2 -%}
+      {%- if is_value == 1 -%}
+        <span class="--fm-value">{{ value_part | escape }}</span>
+      {%- else -%}
+        {%- assign fn_parts = value_part | split: '~' -%}
+        {%- for fn_part in fn_parts -%}
+          {%- assign is_fn = forloop.index0 | modulo: 2 -%}
+          {%- if is_fn == 1 -%}
+            <span class="--fm-fn">{{ fn_part | escape }}</span>
+          {%- else -%}
+            {{- fn_part | escape -}}
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endif -%}
+    {%- endfor -%}
+  </code>
+{%- endif -%}

@@ -1,0 +1,102 @@
+{% comment %}
+  Renders one column of the custom footer, switching on the block type.
+
+  Markup only — styling lives in sections/custom-footer.liquid so the style
+  block is emitted once per section rather than once per block.
+
+  Accepts:
+  - block:   {Object} the column block (required)
+  - section: {Object} the footer section (required)
+
+  Usage:
+  {% render 'custom-footer-column', block: block, section: section %}
+{% endcomment %}
+
+<div class="--fcol --fcol--{{ block.type }}" {{ block.shopify_attributes }}>
+  {%- case block.type -%}
+    {%- when 'brand' -%}
+      <a class="--header-logo --fcol-lockup" href="{{ routes.root_url }}">
+        {%- render 'custom-brand-lockup',
+          logo: block.settings.logo,
+          text: block.settings.logo_text,
+          show_mark: block.settings.show_logo_mark,
+          width: block.settings.logo_width
+        -%}
+      </a>
+
+      {%- if block.settings.text != blank -%}
+        <div class="--fcol-text">{{ block.settings.text }}</div>
+      {%- endif -%}
+
+    {%- when 'menu' -%}
+      {%- if block.settings.heading != blank -%}
+        <h2 class="--fcol-heading">{{ block.settings.heading | escape }}</h2>
+      {%- endif -%}
+
+      {%- if block.settings.menu != blank and block.settings.menu.links.size > 0 -%}
+        <ul class="--fcol-list" role="list">
+          {%- for link in block.settings.menu.links -%}
+            <li>
+              <a
+                class="--fcol-link"
+                href="{{ link.url }}"
+                {% if link.current %}
+                  aria-current="page"
+                {% endif %}
+              >
+                {{- link.title | escape -}}
+              </a>
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+
+    {%- when 'text' -%}
+      {%- if block.settings.heading != blank -%}
+        <h2 class="--fcol-heading">{{ block.settings.heading | escape }}</h2>
+      {%- endif -%}
+
+      {%- if block.settings.text != blank -%}
+        <div class="--fcol-text">{{ block.settings.text }}</div>
+      {%- endif -%}
+
+    {%- when 'social' -%}
+      {%- if block.settings.heading != blank -%}
+        <h2 class="--fcol-heading">{{ block.settings.heading | escape }}</h2>
+      {%- endif -%}
+
+      {%- comment -%}
+        Reads the shop's own social settings, so the links are configured once
+        under Theme settings rather than retyped here.
+      {%- endcomment -%}
+      <ul class="--fcol-list" role="list">
+        {%- if settings.social_instagram_link != blank -%}
+          <li><a class="--fcol-link" href="{{ settings.social_instagram_link }}">Instagram</a></li>
+        {%- endif -%}
+        {%- if settings.social_tiktok_link != blank -%}
+          <li><a class="--fcol-link" href="{{ settings.social_tiktok_link }}">TikTok</a></li>
+        {%- endif -%}
+        {%- if settings.social_youtube_link != blank -%}
+          <li><a class="--fcol-link" href="{{ settings.social_youtube_link }}">YouTube</a></li>
+        {%- endif -%}
+        {%- if settings.social_facebook_link != blank -%}
+          <li><a class="--fcol-link" href="{{ settings.social_facebook_link }}">Facebook</a></li>
+        {%- endif -%}
+        {%- if settings.social_twitter_link != blank -%}
+          <li><a class="--fcol-link" href="{{ settings.social_twitter_link }}">X</a></li>
+        {%- endif -%}
+        {%- if settings.social_pinterest_link != blank -%}
+          <li><a class="--fcol-link" href="{{ settings.social_pinterest_link }}">Pinterest</a></li>
+        {%- endif -%}
+        {%- if settings.social_snapchat_link != blank -%}
+          <li><a class="--fcol-link" href="{{ settings.social_snapchat_link }}">Snapchat</a></li>
+        {%- endif -%}
+        {%- if settings.social_tumblr_link != blank -%}
+          <li><a class="--fcol-link" href="{{ settings.social_tumblr_link }}">Tumblr</a></li>
+        {%- endif -%}
+        {%- if settings.social_vimeo_link != blank -%}
+          <li><a class="--fcol-link" href="{{ settings.social_vimeo_link }}">Vimeo</a></li>
+        {%- endif -%}
+      </ul>
+  {%- endcase -%}
+</div>

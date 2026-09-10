@@ -1,0 +1,643 @@
+{% comment %}
+  Custom footer.
+
+  Structure follows sections/base.liquid: a scoped style block keyed on
+  section.id, a .section-container--{{ section.id }} wrapper carrying the
+  spacing settings, a .section-wrapper--{{ section.id }} inner, then the schema.
+
+  Layout and content follow the footer in made-and-measured-demo-store.html:
+  a hairline above, a wider brand column beside narrower link columns, and a
+  mono bottom bar separated by a lighter rule.
+
+  Column widths are built from the blocks themselves — whichever position the
+  brand block occupies gets the wider track — so columns can be reordered in
+  the editor without the grid going wrong.
+
+  No JavaScript.
+{% endcomment %}
+
+{%- liquid
+  assign ratio = section.settings.brand_ratio | default: 1.4
+
+  capture columns
+    for block in section.blocks
+      if block.type == 'brand'
+        echo ratio | append: 'fr '
+      else
+        echo '1fr '
+      endif
+    endfor
+  endcapture
+-%}
+
+<style>
+  .section-container--{{ section.id }} {
+    --mark-accent: {{ section.settings.mark_accent | default: '#004EBA' }};
+    margin-top: {{ section.settings.margin_top | append: 'px' }};
+    margin-bottom: {{ section.settings.margin_bottom | append: 'px' }};
+    padding-top: {{ section.settings.padding_top | append: 'px' }};
+    padding-bottom: {{ section.settings.padding_bottom | append: 'px' }};
+    {% if section.settings.bg_color != blank %}background: {{ section.settings.bg_color }};{% endif %}
+    {% if section.settings.text_color != blank %}color: {{ section.settings.text_color }};{% endif %}
+    {% if section.settings.show_top_border %}
+      border-top: var(--fds-border-width-fine, 0.1rem) solid var(--fds-color-border-default, #dee0e3);
+    {% endif %}
+  }
+
+  .section-wrapper--{{ section.id }} {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .section-container--{{ section.id }} {
+    .--fgrid {
+      display: grid;
+      grid-template-columns: {{ columns | strip }};
+      gap: {{ section.settings.column_gap | append: 'px' }};
+    }
+
+    .--fcol {
+      min-width: 0;
+    }
+
+    .--fcol-lockup {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.9rem;
+      margin-bottom: 1.2rem;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* Same measurement motif as the header; each section styles the shared
+       lockup classes in its own scope. */
+    .--logo-mark {
+      position: relative;
+      flex: none;
+      width: 2.2rem;
+      height: 2.2rem;
+      border: var(--fds-border-width-regular, 0.2rem) solid currentColor;
+      border-radius: var(--fds-radii-angled, 0);
+    }
+
+    .--logo-mark::after {
+      content: '';
+      position: absolute;
+      inset: 0.4rem 0.4rem auto auto;
+      width: 0.8rem;
+      height: 0.8rem;
+      background: var(--mark-accent);
+    }
+
+    .--header-logo-image {
+      width: {{ section.settings.logo_width_fallback | append: 'px' }};
+      height: auto;
+      display: block;
+    }
+
+    .--header-logo-text {
+      font-family: var(--fds-type-title-family, inherit);
+      font-weight: var(--fds-type-title-weight, 800);
+      font-size: {{ section.settings.logo_text_size | append: 'px' }};
+      line-height: 1;
+      letter-spacing: var(--global-type-letterspacing-0pc, 0);
+      {% if section.settings.uppercase_logo %}text-transform: var(--global-type-case-upper, uppercase);{% endif %}
+      white-space: nowrap;
+    }
+
+    .--fcol-heading {
+      margin: 0 0 1.2rem;
+      color: rgb(var(--color-foreground, 13, 16, 18));
+      font-family: var(--fds-type-heading-family, inherit);
+      font-weight: var(--fds-type-title-weight, 800);
+      font-size: {{ section.settings.heading_size | append: 'px' }};
+      line-height: var(--fds-type-heading-leading, 0.94);
+      {% if section.settings.uppercase_headings %}
+        text-transform: var(--global-type-case-upper, uppercase);
+        letter-spacing: 0.08em;
+      {% endif %}
+    }
+
+    .--fcol-list {
+      margin: 0;
+      padding: 0;
+    }
+
+    .--fcol-list li {
+      list-style: none;
+    }
+
+    .--fcol-link {
+      display: block;
+      padding: 0.4rem 0;
+      color: var(--fds-color-text-muted, #767a7f);
+      text-decoration: none;
+      font-family: var(--fds-type-body-family, inherit);
+      font-size: var(--global-type-size-14, 1.4rem);
+      line-height: var(--global-type-line-height-140pc, 1.4);
+      transition: color var(--duration-default, 200ms) var(--ease-out, ease-out);
+    }
+
+    .--fcol-link:hover,
+    .--fcol-link[aria-current='page'] {
+      color: rgb(var(--color-foreground, 13, 16, 18));
+    }
+
+    .--fcol-text {
+      color: var(--fds-color-text-muted, #767a7f);
+      font-family: var(--fds-type-body-family, inherit);
+      font-size: var(--global-type-size-14, 1.4rem);
+      line-height: var(--global-type-line-height-140pc, 1.4);
+      max-width: 40ch;
+    }
+
+    .--fcol-text p {
+      margin: 0 0 1rem;
+    }
+
+    .--fcol-text p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* ---- bottom bar ---- */
+    .--fbot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.4rem;
+      margin-top: {{ section.settings.bottom_gap | append: 'px' }};
+      padding-top: 2rem;
+      border-top: var(--fds-border-width-fine, 0.1rem) solid var(--global-color-neutral-100, #f4f5f6);
+      color: var(--fds-color-text-muted, #767a7f);
+      font-family: var(--fds-type-meta-family, inherit);
+      font-size: var(--fds-type-meta-size, 1.2rem);
+      line-height: var(--fds-type-meta-leading, 1.3);
+      {% if section.settings.uppercase_bottom %}
+        text-transform: var(--global-type-case-upper, uppercase);
+        letter-spacing: 0.06em;
+      {% endif %}
+    }
+
+    .--fbot-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.6rem;
+      margin: 0;
+      padding: 0;
+    }
+
+    .--fbot-links li {
+      list-style: none;
+    }
+
+    .--fbot a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .--fbot a:hover {
+      color: rgb(var(--color-foreground, 13, 16, 18));
+      text-decoration: underline;
+      text-underline-offset: 0.3em;
+    }
+  }
+
+  @media screen and (max-width: 760px) {
+    .section-container--{{ section.id }} .--fgrid {
+      grid-template-columns: 1fr 1fr;
+      gap: {{ section.settings.column_gap_mobile | append: 'px' }};
+    }
+
+    /* The brand column carries a paragraph — it needs the full width. */
+    .section-container--{{ section.id }} .--fcol--brand {
+      grid-column: 1 / -1;
+    }
+
+    .section-container--{{ section.id }} {
+      margin-top: {{ section.settings.margin_top_mobile | append: 'px' }};
+      margin-bottom: {{ section.settings.margin_bottom_mobile | append: 'px' }};
+      padding-top: {{ section.settings.padding_top_mobile | append: 'px' }};
+      padding-bottom: {{ section.settings.padding_bottom_mobile | append: 'px' }};
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .section-container--{{ section.id }} .--fgrid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .section-container--{{ section.id }} * {
+      transition-duration: 1ms !important;
+    }
+  }
+</style>
+
+<footer
+  class="section-container--{{ section.id }} color-{{ section.settings.color_scheme }}"
+  id="{{ section.settings.navid | default: 'footer' }}"
+>
+  <div class="section-wrapper--{{ section.id }}{% if section.settings.full_width != true %} page-width{% endif %}">
+    {%- if section.blocks.size > 0 -%}
+      <div class="--fgrid">
+        {%- for block in section.blocks -%}
+          {%- render 'custom-footer-column', block: block, section: section -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    <div class="--fbot">
+      <span>
+        {%- if section.settings.show_copyright -%}
+          &copy; {{ 'now' | date: '%Y' }} {{ shop.name }}
+          {%- if section.settings.bottom_left != blank %} — {{ section.settings.bottom_left }}{% endif -%}
+        {%- else -%}
+          {{- section.settings.bottom_left -}}
+        {%- endif -%}
+      </span>
+
+      {%- if section.settings.show_policies -%}
+        <ul class="--fbot-links" role="list">
+          {%- for policy in shop.policies -%}
+            {%- if policy != blank -%}
+              <li><a href="{{ policy.url }}">{{ policy.title }}</a></li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+
+      {%- if section.settings.bottom_right != blank -%}
+        <span>{{ section.settings.bottom_right }}</span>
+      {%- endif -%}
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Custom Footer",
+  "tag": "div",
+  "class": "custom-footer-section",
+  "enabled_on": {
+    "groups": ["footer"]
+  },
+  "max_blocks": 6,
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full Width Section",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "navid",
+      "label": "Id(for navigation)",
+      "default": "footer"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_top_border",
+      "label": "Show top border",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "mark_accent",
+      "label": "Logo mark accent",
+      "default": "#004EBA"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "brand_ratio",
+      "min": 1,
+      "max": 3,
+      "step": 0.1,
+      "label": "Brand column width",
+      "default": 1.4,
+      "info": "Relative to the link columns. Applies wherever the brand block sits."
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "min": 8,
+      "max": 96,
+      "step": 2,
+      "unit": "px",
+      "label": "Column gap",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "column_gap_mobile",
+      "min": 8,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "label": "Column gap (Mobile)",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Type"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "min": 11,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Column heading size",
+      "default": 13
+    },
+    {
+      "type": "checkbox",
+      "id": "uppercase_headings",
+      "label": "Uppercase column headings",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "logo_text_size",
+      "min": 12,
+      "max": 36,
+      "step": 1,
+      "unit": "px",
+      "label": "Wordmark size",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "logo_width_fallback",
+      "min": 60,
+      "max": 320,
+      "step": 5,
+      "unit": "px",
+      "label": "Logo image width",
+      "default": 130
+    },
+    {
+      "type": "checkbox",
+      "id": "uppercase_logo",
+      "label": "Uppercase wordmark",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Bottom bar"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_copyright",
+      "label": "Show copyright",
+      "default": true,
+      "info": "Prepends the current year and shop name."
+    },
+    {
+      "type": "text",
+      "id": "bottom_left",
+      "label": "Bottom left text",
+      "default": "All rights reserved"
+    },
+    {
+      "type": "text",
+      "id": "bottom_right",
+      "label": "Bottom right text",
+      "default": "Powered by Amaze Price Builder"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_policies",
+      "label": "Show store policy links",
+      "default": true,
+      "info": "Lists whichever policies are published in Settings › Policies."
+    },
+    {
+      "type": "checkbox",
+      "id": "uppercase_bottom",
+      "label": "Uppercase bottom bar",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "bottom_gap",
+      "min": 0,
+      "max": 96,
+      "step": 2,
+      "unit": "px",
+      "label": "Space above bottom bar",
+      "default": 34
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "info": "Overrides the color scheme when set."
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color"
+    },
+    {
+      "type": "header",
+      "content": "Desktop Spacing"
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Top",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Bottom",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Mobile Spacing"
+    },
+    {
+      "type": "range",
+      "id": "margin_top_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Top (Mobile)",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin Bottom (Mobile)",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Top (Mobile)",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Bottom (Mobile)",
+      "default": 32
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Brand",
+      "type": "brand",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "logo",
+          "label": "Logo image",
+          "info": "Falls back to the mark and wordmark when empty."
+        },
+        {
+          "type": "text",
+          "id": "logo_text",
+          "label": "Wordmark",
+          "info": "Defaults to the shop name."
+        },
+        {
+          "type": "checkbox",
+          "id": "show_logo_mark",
+          "label": "Show logo mark",
+          "default": true
+        },
+        {
+          "type": "range",
+          "id": "logo_width",
+          "min": 60,
+          "max": 320,
+          "step": 5,
+          "unit": "px",
+          "label": "Logo image width",
+          "default": 130
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Description",
+          "default": "<p>A demo storefront showing what Amaze Price Builder can do on real product pages.</p>"
+        }
+      ]
+    },
+    {
+      "name": "Menu",
+      "type": "menu",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Shop"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu",
+          "default": "footer"
+        }
+      ]
+    },
+    {
+      "name": "Text",
+      "type": "text",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "About"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Tell shoppers something useful about the store.</p>"
+        }
+      ]
+    },
+    {
+      "name": "Social links",
+      "type": "social",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Follow"
+        },
+        {
+          "type": "paragraph",
+          "content": "Lists whichever social links are filled in under Theme settings › Social media."
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

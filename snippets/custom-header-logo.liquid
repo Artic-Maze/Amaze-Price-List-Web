@@ -1,13 +1,9 @@
 {% comment %}
   Renders the header logo.
 
-  Three shapes, matching the demo store's lockup:
-  - a picked image, used alone;
-  - otherwise a square "mark" plus the shop name as a wordmark;
-  - the mark can be turned off to leave the wordmark on its own.
-
-  The mark is the demo's measurement motif: a bordered square with a small
-  accent square notched into its top-right corner.
+  The lockup itself comes from snippets/custom-brand-lockup.liquid, shared
+  with the footer. This snippet owns the header-specific wrapper: the link,
+  the current-page state and the visually hidden shop name.
 
   Markup only; styling lives in sections/custom-header.liquid.
 
@@ -25,24 +21,12 @@
 -%}
 
 {%- capture logo_inner -%}
-  {%- if logo != blank -%}
-    {{
-      logo
-      | image_url: width: 600
-      | image_tag:
-        class: '--header-logo-image',
-        widths: '120, 180, 240, 360, 480, 600',
-        sizes: logo_width | append: 'px',
-        loading: 'eager',
-        fetchpriority: 'high',
-        alt: shop.name
-    }}
-  {%- else -%}
-    {%- if section.settings.show_logo_mark -%}
-      <span class="--logo-mark" aria-hidden="true"></span>
-    {%- endif -%}
-    <span class="--header-logo-text">{{ wordmark }}</span>
-  {%- endif -%}
+  {%- render 'custom-brand-lockup',
+    logo: logo,
+    text: wordmark,
+    show_mark: section.settings.show_logo_mark,
+    width: logo_width
+  -%}
 {%- endcapture -%}
 
 {%- comment -%}
