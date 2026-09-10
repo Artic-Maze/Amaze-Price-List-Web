@@ -109,6 +109,15 @@
     </a>
   {%- endif -%}
 
+  {%- comment -%}
+    Dawn's cart scripts write into #cart-icon-bubble without a null check
+    (assets/cart.js:225) and cart-drawer.js binds its opener to it. This header
+    uses its own cart markup, so a hidden placeholder gives those scripts the
+    element they require while the visible button stays ours. Dawn re-renders
+    this element's contents on every cart update; nothing here depends on them.
+  {%- endcomment -%}
+  <span id="cart-icon-bubble" hidden></span>
+
   {%- if section.settings.cta_label != blank -%}
     <a class="--header-cta" href="{{ section.settings.cta_link | default: routes.all_products_collection_url }}">
       {{- section.settings.cta_label | escape -}}

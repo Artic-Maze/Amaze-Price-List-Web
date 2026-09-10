@@ -350,6 +350,14 @@
 
     {% sections 'footer-group' %}
 
+    {%- comment -%}
+      Cart branding layer. Loaded site-wide because the drawer is mounted on
+      every page, and placed after the sections because the cart page's own
+      sections load Dawn's component-cart / component-totals CSS in the body —
+      a head-level link would lose the cascade to them at equal specificity.
+    {%- endcomment -%}
+    {{ 'custom-cart.css' | asset_url | stylesheet_tag }}
+
     <ul hidden>
       <li id="a11y-refresh-page-message">{{ 'accessibility.refresh_page' | t }}</li>
       <li id="a11y-new-window-message">{{ 'accessibility.link_messages.new_window' | t }}</li>

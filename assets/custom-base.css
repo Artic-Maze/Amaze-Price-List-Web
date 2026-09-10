@@ -872,3 +872,6 @@ span.swiper-pagination-bullet {
 .--nav-icon path{
   fill: #fff;
 }
+cart-remove-button .button {
+  background-color: transparent;
+}

@@ -373,6 +373,23 @@
     }
   };
 
+  /* ---------------------------------------------------------------------
+   * Cart drawer
+   * With settings.cart_type = 'drawer' the cart button opens the drawer
+   * rather than navigating. Dawn binds its own opener to #cart-icon-bubble,
+   * which this header renders only as a hidden placeholder, so the visible
+   * button is wired here instead. Falls back to following the /cart link
+   * whenever no drawer is mounted or it has not upgraded yet.
+   * ------------------------------------------------------------------- */
+  document.addEventListener('click', (event) => {
+    const link = event.target.closest('[data-cart-link]');
+    if (!link) return;
+    const drawer = document.querySelector('cart-drawer');
+    if (!drawer || typeof drawer.open !== 'function') return;
+    event.preventDefault();
+    drawer.open(link);
+  });
+
   document.addEventListener('cart:refresh', refreshCartCount);
   document.addEventListener('cart:update', refreshCartCount);
   window.addEventListener('pageshow', (event) => {

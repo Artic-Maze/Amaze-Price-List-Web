@@ -1,0 +1,320 @@
+/* ===========================================================================
+   CUSTOM CART — branding layer
+   ---------------------------------------------------------------------------
+   Retargets Dawn's cart drawer and cart page onto the Gymshark token layer,
+   in the same non-invasive way as assets/custom-main-product.css: no section
+   file is forked, so cart-drawer.js and Dawn's section-rendering keep working
+   and future Dawn updates stay mergeable.
+
+   Loaded site-wide from layout/theme.liquid, because the drawer is mounted on
+   every page.
+
+   The demo store's cart is the reference: a narrow column of bordered line
+   cards, each with the product name in the display face and the calculator's
+   spec beneath it in mono, a muted-red remove link, a dashed empty state, and
+   a total separated by a rule.
+
+   The "spec" line is Shopify line item properties — which is exactly where the
+   Amaze Price Builder app writes the measurements it priced from. Dawn renders
+   them as a <dl> of .product-option pairs; that markup is kept (it is better
+   semantics than the demo's single string) and only restyled.
+   =========================================================================== */
+
+/* ---------------------------------------------------------------------------
+   1. Shared line item treatment — drawer and cart page
+   --------------------------------------------------------------------------- */
+.cart-item__name,
+.cart-item__name.h4 {
+  font-family: var(--fds-type-heading-family, inherit);
+  font-weight: var(--fds-type-title-weight, 800);
+  font-size: var(--global-type-size-14, 1.4rem);
+  line-height: var(--fds-type-heading-leading, 0.94);
+  letter-spacing: var(--global-type-letterspacing-0pc, 0);
+  color: rgb(var(--color-foreground, 13, 16, 18));
+  text-decoration: none;
+}
+
+.cart-item__name:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
+
+/* Variant options and line item properties — the calculator's spec. */
+.cart-item .product-option,
+.cart-item__details .product-option {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+  font-family: var(--fds-type-meta-family, inherit);
+  font-size: 1.15rem;
+  line-height: var(--fds-type-meta-leading, 1.3);
+  color: var(--fds-color-text-muted, #767a7f);
+}
+
+.cart-item .product-option dt,
+.cart-item .product-option dd {
+  margin: 0;
+}
+
+.cart-item .product-option dd {
+  color: rgb(var(--color-foreground, 13, 16, 18));
+  font-weight: var(--global-type-weight-skandia-bold, 700);
+}
+
+.cart-item__price-wrapper,
+.cart-item__totals .cart-item__price-wrapper {
+  font-family: var(--fds-type-title-family, inherit);
+  font-weight: var(--fds-type-title-weight, 800);
+  white-space: nowrap;
+}
+
+.cart-item__old-price {
+  color: var(--fds-color-text-muted, #767a7f);
+  font-weight: var(--global-type-weight-skandia-book, 400);
+}
+
+.cart-item__discounted-prices .cart-item__final-price,
+.cart-item .price--on-sale {
+  color: var(--fds-color-text-sale, #dc0428);
+}
+
+/* Square media, hairline border, matching the product cards. */
+.cart-item__image,
+.cart-item__media .cart-item__image {
+  border-radius: var(--fds-radii-angled, 0);
+  border: var(--fds-border-width-fine, 0.1rem) solid var(--fds-color-border-default, #dee0e3);
+  background: var(--global-color-neutral-100, #f4f5f6);
+}
+
+.cart-item .quantity,
+.cart-item .quantity__input,
+.cart-item .quantity__button {
+  border-radius: var(--fds-radii-angled, 0);
+  font-family: var(--fds-type-body-family, inherit);
+}
+
+/* Dawn renders Remove as an icon button; give it the demo's muted red. */
+.cart-item .button--tertiary,
+.cart-remove-button .button {
+  color: var(--global-color-red-600, #9e071b);
+  border-radius: var(--fds-radii-angled, 0);
+}
+
+.cart-item .button--tertiary:hover,
+.cart-remove-button .button:hover {
+  color: var(--fds-color-feedback-error, #dc0428);
+}
+
+.cart-item__error-text {
+  font-family: var(--fds-type-meta-family, inherit);
+  font-size: var(--fds-type-meta-size, 1.2rem);
+  color: var(--fds-color-feedback-error, #dc0428);
+}
+
+/* ---------------------------------------------------------------------------
+   2. Cart page
+   --------------------------------------------------------------------------- */
+.cart__empty-text,
+.cart h1,
+.cart .title {
+  font-family: var(--fds-type-title-family, inherit);
+  font-weight: var(--fds-type-title-weight, 800);
+  letter-spacing: var(--global-type-letterspacing-0pc, 0);
+}
+
+.cart__warnings {
+  padding-block: var(--global-spacing-64, 6.4rem);
+}
+
+/* Dashed empty state, as in the demo. */
+.cart__warnings .cart__empty-text {
+  display: inline-block;
+  padding: var(--global-spacing-40, 4rem);
+  border: var(--fds-border-width-fine, 0.1rem) dashed var(--fds-color-border-default, #dee0e3);
+  border-radius: var(--fds-radii-angled, 0);
+  color: var(--fds-color-text-muted, #767a7f);
+  font-family: var(--fds-type-body-family, inherit);
+  font-weight: var(--global-type-weight-skandia-book, 400);
+  font-size: var(--global-type-size-16, 1.6rem);
+}
+
+/* Each row reads as a bordered card rather than a table stripe. */
+.cart-items tbody td {
+  border: 0;
+}
+
+.cart-items tbody tr.cart-item {
+  border: var(--fds-border-width-fine, 0.1rem) solid var(--fds-color-border-default, #dee0e3);
+  border-radius: var(--fds-radii-angled, 0);
+  background: var(--fds-color-surface-default, #fff);
+}
+
+.cart-items th {
+  font-family: var(--fds-type-meta-family, inherit);
+  font-size: var(--fds-type-meta-size, 1.2rem);
+  font-weight: var(--global-type-weight-skandia-bold, 700);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fds-color-text-muted, #767a7f);
+  border-bottom-color: var(--fds-color-border-default, #dee0e3);
+}
+
+.cart__footer {
+  border-top: var(--fds-border-width-fine, 0.1rem) solid var(--fds-color-border-default, #dee0e3);
+  padding-top: var(--global-spacing-24, 2.4rem);
+}
+
+.totals {
+  align-items: baseline;
+}
+
+.totals__total,
+.totals > h2 {
+  font-family: var(--fds-type-body-family, inherit);
+  font-size: var(--global-type-size-14, 1.4rem);
+  font-weight: var(--global-type-weight-skandia-book, 400);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fds-color-text-muted, #767a7f);
+}
+
+.totals__total-value {
+  font-family: var(--fds-type-title-family, inherit);
+  font-weight: var(--fds-type-title-weight, 800);
+  font-size: var(--global-type-size-24, 2.4rem);
+  line-height: 1;
+  letter-spacing: var(--global-type-letterspacing-0pc, 0);
+  color: rgb(var(--color-foreground, 13, 16, 18));
+}
+
+.tax-note,
+.cart__login-paragraph {
+  font-family: var(--fds-type-meta-family, inherit);
+  font-size: var(--fds-type-meta-size, 1.2rem);
+  color: var(--fds-color-text-muted, #767a7f);
+}
+
+.cart__note label,
+.cart-note__label {
+  font-family: var(--fds-type-meta-family, inherit);
+  font-size: var(--fds-type-meta-size, 1.2rem);
+  font-weight: var(--global-type-weight-skandia-bold, 700);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fds-color-text-muted, #767a7f);
+}
+
+.cart__note .text-area,
+.cart__note textarea {
+  border-radius: var(--fds-radii-angled, 0);
+  font-family: var(--fds-type-body-family, inherit);
+}
+
+/* ---------------------------------------------------------------------------
+   3. Checkout and update buttons
+   --------------------------------------------------------------------------- */
+.cart__checkout-button,
+.cart__update-button,
+.cart-drawer .cart__checkout-button {
+  border-radius: var(--fds-radii-angled, 0);
+  font-family: var(--fds-type-body-family, inherit);
+  font-size: var(--global-type-size-14, 1.4rem);
+  font-weight: var(--global-type-weight-skandia-bold, 700);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  min-height: 5.2rem;
+}
+
+.cart__checkout-button {
+  background: var(--fds-color-surface-inverse, #0d1012);
+  color: var(--fds-color-text-inverse, #fff);
+  border-color: transparent;
+}
+
+.cart__checkout-button:hover:not([disabled]) {
+  background: var(--global-color-neutral-800, #1b1d22);
+}
+
+/* ---------------------------------------------------------------------------
+   4. Cart drawer
+   --------------------------------------------------------------------------- */
+.cart-drawer__overlay::after,
+.cart-drawer__overlay {
+  background-color: var(--fds-color-overlay-on-light70, rgba(13, 16, 18, 0.7));
+}
+
+.cart-drawer .drawer__inner {
+  border-radius: var(--fds-radii-angled, 0);
+  border-left: var(--fds-border-width-fine, 0.1rem) solid var(--fds-color-border-default, #dee0e3);
+  box-shadow: var(--box-shadow-large, 0 4px 60px 0 rgba(0, 0, 0, 0.1));
+}
+
+.cart-drawer .drawer__header {
+  border-bottom: var(--fds-border-width-fine, 0.1rem) solid var(--fds-color-border-default, #dee0e3);
+  padding-bottom: var(--global-spacing-16, 1.6rem);
+}
+
+.cart-drawer .drawer__heading {
+  font-family: var(--fds-type-title-family, inherit);
+  font-weight: var(--fds-type-title-weight, 800);
+  font-size: var(--global-type-size-20, 2rem);
+  line-height: var(--fds-type-title-leading, 0.9);
+  letter-spacing: var(--global-type-letterspacing-0pc, 0);
+  text-transform: var(--global-type-case-upper, uppercase);
+  margin: 0;
+}
+
+.cart-drawer .drawer__close {
+  border-radius: var(--fds-radii-angled, 0);
+}
+
+/* Line items in the drawer are separated by a rule rather than boxed, so the
+   narrow column does not turn into a stack of nested borders. */
+.cart-drawer .cart-item {
+  padding-block: var(--global-spacing-16, 1.6rem);
+  border-bottom: var(--fds-border-width-fine, 0.1rem) solid var(--global-color-neutral-100, #f4f5f6);
+}
+
+.cart-drawer .cart-items thead,
+.cart-drawer .cart-items th {
+  display: none;
+}
+
+.cart-drawer .drawer__footer {
+  border-top: var(--fds-border-width-fine, 0.1rem) solid var(--fds-color-border-default, #dee0e3);
+}
+
+.cart-drawer .totals__total-value {
+  font-size: var(--global-type-size-20, 2rem);
+}
+
+.cart-drawer__empty-content .cart__empty-text {
+  font-family: var(--fds-type-title-family, inherit);
+  font-weight: var(--fds-type-title-weight, 800);
+  text-transform: var(--global-type-case-upper, uppercase);
+  letter-spacing: var(--global-type-letterspacing-0pc, 0);
+}
+
+.cart-drawer__collection .button,
+.cart-drawer__warnings .button {
+  border-radius: var(--fds-radii-angled, 0);
+  font-family: var(--fds-type-body-family, inherit);
+  font-weight: var(--global-type-weight-skandia-bold, 700);
+  text-transform: var(--global-type-case-upper, uppercase);
+  letter-spacing: 0.08em;
+}
+
+/* ---------------------------------------------------------------------------
+   5. Cart bubble in the custom header
+   Dawn's cart-drawer.js swaps #cart-icon-bubble; the custom header uses its
+   own markup, so keep the count pill consistent either way.
+   --------------------------------------------------------------------------- */
+.cart-count-bubble {
+  border-radius: var(--fds-radii-relaxed, 10rem);
+  background: var(--fds-color-surface-inverse, #0d1012);
+  color: var(--fds-color-text-inverse, #fff);
+  font-family: var(--fds-type-meta-family, inherit);
+  font-size: 1rem;
+  font-weight: var(--global-type-weight-skandia-bold, 700);
+}

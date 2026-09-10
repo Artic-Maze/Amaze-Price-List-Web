@@ -393,6 +393,7 @@ cart-items .title-wrapper-with-link {
 }
 
 cart-remove-button .button {
+  background-color: transparent;
   min-width: calc(4.5rem / var(--font-body-scale));
   min-height: 4.5rem;
   padding: 0;
